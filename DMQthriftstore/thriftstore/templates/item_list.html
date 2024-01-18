@@ -1,0 +1,83 @@
+<!-- templates/thriftstore/item_list.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Thrift Store Items</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f4f4f4;
+        }
+        .header {
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 10px 0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-gap: 20px;
+        }
+        .card {
+            background: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+        .card h3 {
+            margin: 0 0 10px 0;
+        }
+        .card p {
+            color: #555;
+        }
+        .card .price {
+            font-weight: bold;
+            color: #333;
+        }
+        .add-button {
+            display: block;
+            background: #5cb85c;
+            color: white;
+            padding: 10px 15px;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to Our Thrift Store</h1>
+    </div>
+    <div class="container">
+        {% for item in items %}
+            <div class="card">
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.description }}</p>
+                <p class="price">$ {{ item.price }}</p>
+                <form action="{% url 'buy_item' item.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Buy</button>
+                </form>
+            </div>
+        {% empty %}
+            <p>No items available.</p>
+        {% endfor %}
+    </div>
+    <a href="{% url 'add_item' %}" class="add-button">Add New Item</a>
+    <h2>Recently Sold Items</h2>
+<ul>
+    {% for item in recently_sold_items %}
+        <li>{{ item.title }} - Sold on {{ item.sold_at }}</li>
+    {% empty %}
+        <li>No recently sold items.</li>
+    {% endfor %}
+</ul>
+</body>
+</html>
