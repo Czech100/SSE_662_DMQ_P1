@@ -1,4 +1,3 @@
-<!-- templates/thriftstore/item_list.html -->
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,28 +9,12 @@
             padding: 0;
             background: #f4f4f4;
         }
-        #view-cart {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 10px 20px;
-            background-color: #f8c102;
-            color: #fff;
-            text-decoration: none;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: bold;
-            z-index: 1000; /* Ensure it's above other items */
-        }
-        #view-cart:hover {
-            background-color: #e5b600;
-        }
         .header {
-            background: #333;
+            background-color: #232f3e;  /* Darker header for contrast */
             color: #fff;
             text-align: center;
             padding: 10px 0;
+            font-size: 24px;  /* Larger font size for header */
         }
         .container {
             width: 80%;
@@ -42,29 +25,84 @@
         }
         .card {
             background: #fff;
-            border: 1px solid #ddd;
-            padding: 15px;
-            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+            border-radius: 7px;
+            overflow: hidden;  /* Added to handle border-radius */
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+            transition: 0.3s;  /* Smooth transition for hover effect */
+        }
+        .card:hover {
+            box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);  /* Enhance shadow on hover */
         }
         .card h3 {
-            margin: 0 0 10px 0;
+            color: #333;
+            padding: 2px 16px;
         }
         .card p {
             color: #555;
+            padding: 2px 16px;
         }
         .card .price {
+            color: #007600;  /* Green color for price */
             font-weight: bold;
+            padding: 2px 16px;
+            margin-bottom: 10px;
+        }
+        .card form {
+            text-align: center;  /* Center align buttons */
+            margin-bottom: 10px;  /* Spacing below buttons */
+        }
+        .card button {
+            border: none;
+            outline: 0;
+            padding: 10px 15px; /* Adjust padding as needed */
+            color: white;
+            background-color: #007bff; /* Bootstrap primary color for example */
+            text-align: center;
+            cursor: pointer;
+            border-radius: 5px; /* Rounded corners for the button */
+            font-size: 16px; /* Adjust font size as needed */
+            margin: 5px; /* Space around the button */
+        }
+        .card button:hover {
+            background-color: #0056b3;
+            opacity: 0.7;
+        }
+        .top-right-button {
+            position: fixed;
+            top: 10px;
+            padding: 10px 20px;
+            background-color: #ff9900;  /* Amazon-like orange color */
+            color: white;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 1000;
+            transition: background-color 0.3s;
+        }
+
+        .top-right-button:hover {
+            background-color: #cc7a00;  /* Darker orange on hover */
+        }
+        .reviews, .recently-sold {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 15px;
+            border-radius: 7px;
+            box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+        }
+        .reviews h2, .recently-sold h2 {
             color: #333;
         }
-        .add-button {
-            display: block;
-            background: #5cb85c;
-            color: white;
-            padding: 10px 15px;
-            text-align: center;
-            border-radius: 5px;
-            text-decoration: none;
-            margin: 20px 0;
+        .reviews .review, .recently-sold li {
+            border-bottom: 1px solid #ddd;
+            padding: 10px;
+            list-style-type: none;  /* Remove bullet points */
+        }
+        .reviews .review:last-child, .recently-sold li:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
@@ -78,23 +116,26 @@
                 <h3>{{ item.title }}</h3>
                 <p>{{ item.description }}</p>
                 <p class="price">$ {{ item.price }}</p>
-                <form action="{% url 'buy_item' item.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit">Buy</button>
-                </form>
-                <form action="{% url 'add_to_cart' item.id %}" method="post">
-                    {% csrf_token %}
-                    <button type="submit">Add to Cart</button>
-                </form>
+                <div class="button-group"> <!-- Add this wrapper for better control -->
+                    <form action="{% url 'buy_item' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Buy</button>
+                    </form>
+                    <form action="{% url 'add_to_cart' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Add to Cart</button>
+                    </form>
+                </div>
             </div>
         {% empty %}
             <p>No items available.</p>
         {% endfor %}
     </div>
-    <a href="{% url 'add_item' %}" class="add-button">Add New Item</a>
-    <a href="{% url 'cart_detail' %}" id="view-cart">View Cart</a>
-    <a href="{% url 'review_form' %}">Leave a Product Review</a>
-    <h2>Recently Sold Items</h2>
+    <a href="{% url 'add_item' %}" class="top-right-button" style="right: 360px;">Add New Item</a>
+    <a href="{% url 'cart_detail' %}" class="top-right-button" style="right: 235px;">View Cart</a>
+    <a href="{% url 'review_form' %}" class="top-right-button" style="right: 0px;">Leave a Product Review</a>
+    <div class ='recently-sold'>
+        <h2>Recently Sold Items</h2>
 <ul>
     {% for item in recently_sold_items %}
         <li>{{ item.title }} - Sold on {{ item.sold_at }}</li>
@@ -102,6 +143,7 @@
         <li>No recently sold items.</li>
     {% endfor %}
 </ul>
+    </div>
 <div class="reviews">
     <h2>Product Reviews</h2>
 {% for review in reviews %}
