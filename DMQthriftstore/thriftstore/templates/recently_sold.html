@@ -1,0 +1,7 @@
+<!-- templates/thriftstore/recently_sold.html -->
+<h2>Recently Sold Items</h2>
+{% for item in sold_items %}
+    <p>{{ item.title }} - Sold for ${{ item.price }}</p>
+{% empty %}
+    <p>No recently sold items.</p>
+{% endfor %}

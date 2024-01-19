@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 
+
 # Create your models here.
 
 class Item(models.Model):
@@ -15,3 +16,5 @@ class Item(models.Model):
         self.is_sold = True
         self.sold_at = timezone.now()
         self.save()
+
+

@@ -10,6 +10,23 @@
             padding: 0;
             background: #f4f4f4;
         }
+        #view-cart {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 10px 20px;
+            background-color: #f8c102;
+            color: #fff;
+            text-decoration: none;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            z-index: 1000; /* Ensure it's above other items */
+        }
+        #view-cart:hover {
+            background-color: #e5b600;
+        }
         .header {
             background: #333;
             color: #fff;
@@ -65,12 +82,17 @@
                     {% csrf_token %}
                     <button type="submit">Buy</button>
                 </form>
+                <form action="{% url 'add_to_cart' item.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Add to Cart</button>
+                </form>
             </div>
         {% empty %}
             <p>No items available.</p>
         {% endfor %}
     </div>
     <a href="{% url 'add_item' %}" class="add-button">Add New Item</a>
+    <a href="{% url 'cart_detail' %}" id="view-cart">View Cart</a>
     <h2>Recently Sold Items</h2>
 <ul>
     {% for item in recently_sold_items %}

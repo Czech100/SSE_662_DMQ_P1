@@ -1,0 +1,36 @@
+<!-- templates/thriftstore/cart_detail.html -->
+<head>
+    <!-- ... other head elements ... -->
+
+    <style>
+        .back-to-list-button {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none; /* Remove underline from link */
+            border-radius: 5px;
+            text-align: center;
+        }
+        .back-to-list-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<h2>Your Cart</h2>
+<div>
+    {% for item in items %}
+    <p>{{ item.title }} - ${{ item.price }}</p>
+    <!-- Add quantity if needed -->
+    <a href="{% url 'remove_from_cart' item.id %}">Remove from Cart</a>
+    {% empty %}
+    <p>Your cart is empty.</p>
+    {% endfor %}
+</div>
+<form action="{% url 'item_list' %}">
+    <button type="submit" class="back-to-list-button">Back to Item List</button>
+</form>
+<form action="{% url 'checkout' %}">
+    <button type="submit" class="back-to-list-button">Checkout</button>
+</form>
