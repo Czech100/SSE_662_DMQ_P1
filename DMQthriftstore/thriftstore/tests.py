@@ -1,6 +1,6 @@
 from django.test import TestCase, Client
-from .models import Item
-from .forms import ItemForm
+from .models import Item, Review
+from .forms import ItemForm, ReviewForm
 from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
@@ -123,3 +123,40 @@ class CartTestCase(TestCase):
         cart = session.get('cart', {})
 
 
+class ReviewFormTests(TestCase):
+
+    def test_review_form_submission(self):
+        # Data for the review form
+        form_data = {
+            'name': 'Test User',
+            'comment': 'This is a test review.'
+        }
+
+        # Submitting the review form
+        response = self.client.post(reverse('review_form'), form_data)
+
+        # Check if the form submission redirects to the item list page
+        self.assertRedirects(response, reverse('item_list'))
+
+        # Check if the review was created
+        self.assertEqual(Review.objects.count(), 1)
+        review = Review.objects.first()
+        self.assertEqual(review.name, 'Test User')
+        self.assertEqual(review.comment, 'This is a test review.')
+
+class ItemListPageTests(TestCase):
+
+    def setUp(self):
+        # Create some test reviews
+        Review.objects.create(name='User 1', comment='Comment 1')
+        Review.objects.create(name='User 2', comment='Comment 2')
+
+    def test_display_reviews_on_item_list_page(self):
+        # Request the item list page
+        response = self.client.get(reverse('item_list'))
+
+        # Check if the page contains the reviews
+        self.assertContains(response, 'Comment 1')
+        self.assertContains(response, 'Comment 2')
+        self.assertContains(response, 'User 1')
+        self.assertContains(response, 'User 2')

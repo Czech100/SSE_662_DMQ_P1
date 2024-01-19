@@ -93,6 +93,7 @@
     </div>
     <a href="{% url 'add_item' %}" class="add-button">Add New Item</a>
     <a href="{% url 'cart_detail' %}" id="view-cart">View Cart</a>
+    <a href="{% url 'review_form' %}">Leave a Product Review</a>
     <h2>Recently Sold Items</h2>
 <ul>
     {% for item in recently_sold_items %}
@@ -101,5 +102,16 @@
         <li>No recently sold items.</li>
     {% endfor %}
 </ul>
+<div class="reviews">
+    <h2>Product Reviews</h2>
+{% for review in reviews %}
+    <div class="review">
+        <p><strong>{{ review.name }}</strong> ({{ review.created_at|date:"Y-m-d H:i" }})</p>
+        <p>{{ review.comment }}</p>
+    </div>
+{% empty %}
+    <p>No reviews yet.</p>
+{% endfor %}
+</div>
 </body>
 </html>
