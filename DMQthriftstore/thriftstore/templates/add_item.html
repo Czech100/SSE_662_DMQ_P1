@@ -70,11 +70,9 @@
     <div class="container">
         <form method="post">
             {% csrf_token %}
-            {{ form.as_p }}
-            {{ form.seller_form.as_p }}
-            <div class="form-group">
-                <button type="submit">Add Item</button>
-            </div>
+            {{ item_form.as_p }}
+            {{ seller_form.as_p }}
+            <button type="submit">Add Item</button>
         </form>
         <a href="{% url 'item_list' %}" class="back-link">Back to Item List</a>
     </div>

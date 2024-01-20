@@ -1,30 +1,29 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Item, Review
-from .forms import ItemForm, ReviewForm
+from .forms import ItemForm, ReviewForm, SellerForm
+from django.db.models import Q
 
 
 # Create your views here.
 
 def item_list(request):
     reviews = Review.objects.all().order_by('-created_at')
-    recently_sold_items = Item.objects.filter(is_sold=True).order_by('-sold_at')[:5]  # Adjust the number as needed
+    
+    # Filter items that are not sold
+    available_items = Item.objects.filter(is_sold=0)
+    
+    recently_sold_items = Item.objects.filter(is_sold=0).order_by('-sold_at')[:5]  # Adjust the number as needed
 
     category = request.GET.get('category')
-    print(f"Category selected: {category}")
-
-    item_query = Item.objects.all()
-
-
+    
+    # Apply additional filters based on category
     if category:
-        # Apply the category filter if a category is selected
-        item_query = item_query.filter(category=category, is_sold=False)
+        available_items = available_items.filter(category=category)
 
-
-    print(f"Number of available items: {len(item_query)}")
     categories = Item.CATEGORY_CHOICES
 
     return render(request, 'item_list.html', {
-        'items': item_query,
+        'items': available_items,
         'recently_sold_items': recently_sold_items,
         'reviews': reviews,
         'categories': categories, 
@@ -32,15 +31,21 @@ def item_list(request):
 
 def add_item(request):
     if request.method == "POST":
-        form = ItemForm(request.POST)
-        if form.is_valid():
-            form.save()
+        item_form = ItemForm(request.POST)
+        seller_form = SellerForm(request.POST)
+
+        if item_form.is_valid() and seller_form.is_valid():
+            seller = seller_form.save()  # Create and save the Seller instance
+            item = item_form.save(commit=False)  # Create the Item instance but don't save it yet
+            item.seller = seller  # Associate the item with the seller
+            item.save()  # Save the Item instance with the seller reference
+
             return redirect('item_list')  # Redirect to the list view
-        else:
-            print(form.errors)
     else:
-        form = ItemForm()
-    return render(request, 'add_item.html', {'form': form})
+        item_form = ItemForm()
+        seller_form = SellerForm()
+
+    return render(request, 'add_item.html', {'item_form': item_form, 'seller_form': seller_form})
 
 def buy_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
