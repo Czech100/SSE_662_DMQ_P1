@@ -111,6 +111,15 @@
         <h1>Welcome to Our Thrift Store</h1>
     </div>
     <div class="container">
+        <form method="GET">
+            <select name="category">
+                <option value="">All Categories</option>
+                {% for code, name in categories %}
+                <option value="{{ code }}" {% if request.GET.category == code %} selected {% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filter</button>
+        </form>
         {% for item in items %}
             <div class="card">
                 <h3>{{ item.title }}</h3>

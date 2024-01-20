@@ -7,12 +7,27 @@ from .forms import ItemForm, ReviewForm
 
 def item_list(request):
     reviews = Review.objects.all().order_by('-created_at')
-    available_items = Item.objects.filter(is_sold=False)
     recently_sold_items = Item.objects.filter(is_sold=True).order_by('-sold_at')[:5]  # Adjust the number as needed
+
+    category = request.GET.get('category')
+    print(f"Category selected: {category}")
+
+    item_query = Item.objects.all()
+
+
+    if category:
+        # Apply the category filter if a category is selected
+        item_query = item_query.filter(category=category, is_sold=False)
+
+
+    print(f"Number of available items: {len(item_query)}")
+    categories = Item.CATEGORY_CHOICES
+
     return render(request, 'item_list.html', {
-        'items': available_items,
+        'items': item_query,
         'recently_sold_items': recently_sold_items,
-        'reviews': reviews
+        'reviews': reviews,
+        'categories': categories, 
     })
 
 def add_item(request):
@@ -21,6 +36,8 @@ def add_item(request):
         if form.is_valid():
             form.save()
             return redirect('item_list')  # Redirect to the list view
+        else:
+            print(form.errors)
     else:
         form = ItemForm()
     return render(request, 'add_item.html', {'form': form})

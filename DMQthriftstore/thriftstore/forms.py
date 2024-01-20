@@ -5,7 +5,24 @@ from .models import Item, Review, Seller
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['title', 'description', 'price', 'seller']
+        fields = ['title', 'description', 'price', 'category']
+
+    def __init__(self, *args, **kwargs):
+        super(ItemForm, self).__init__(*args, **kwargs)
+        self.seller_form = SellerForm()
+
+    def save(self, commit=True):
+        item = super().save(commit=False)
+
+        seller_form = SellerForm(self.data)
+        if seller_form.is_valid():
+            seller = seller_form.save()
+            item.seller = seller
+
+        if commit:
+            item.save()
+
+        return item
 
 class ReviewForm(forms.ModelForm):
     class Meta:

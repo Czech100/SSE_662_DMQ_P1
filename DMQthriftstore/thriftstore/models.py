@@ -21,7 +21,15 @@ class Item(models.Model):
     is_sold = models.BooleanField(default=False)
     sold_at = models.DateTimeField(null=True, blank=True)
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
+
+    CATEGORY_CHOICES = (
+        ('CLOTHING', 'Clothing'),
+        ('ELECTRONICS', 'Electronics'),
+        ('BOOKS', 'Books'),
+        ('FURNITURE', 'Furniture'),
+    )
     
+    category = models.CharField(max_length=50, choices=CATEGORY_CHOICES, default='CLOTHING')
     
     def mark_as_sold(self):
         self.is_sold = True

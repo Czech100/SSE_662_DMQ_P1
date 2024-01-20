@@ -12,11 +12,12 @@ class ItemModelTest(TestCase):
         self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
 
     def test_item_creation(self):
-        item = Item.objects.create(title="Test Item", description = "Just a test item.", price=9.99, seller = self.seller1)
+        item = Item.objects.create(title="Test Item", description = "Just a test item.", price=9.99, seller = self.seller1, category="CLOTHING")
         self.assertEqual(item.title, "Test Item")
         self.assertEqual(item.description, "Just a test item.")
         self.assertEqual(item.price, 9.99)
         self.assertEqual(item.seller.id, self.seller1.id)
+        self.assertEqual(item.category, "CLOTHING")
 
 
 class ItemFormTest(TestCase):
@@ -24,12 +25,12 @@ class ItemFormTest(TestCase):
         self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
 
     def test_form_validity(self):
-        form_data = {'title': 'Test Item', 'description': 'A test item', 'price': 9.99, 'seller': self.seller1}
+        form_data = {'title': 'Test Item', 'description': 'A test item', 'price': 9.99, 'seller': self.seller1, 'category':'CLOTHING'}
         form = ItemForm(data=form_data)
         self.assertTrue(form.is_valid())
 
     def test_form_saves_item(self):
-        form_data = {'title': 'Test Item', 'description': 'A test item', 'price': 9.99, 'seller': self.seller1}
+        form_data = {'title': 'Test Item', 'description': 'A test item', 'price': 9.99, 'seller': self.seller1, 'category':'CLOTHING'}
         form = ItemForm(data=form_data)
         if form.is_valid():
             new_item = form.save()
@@ -48,7 +49,15 @@ class AddItemViewTest(TestCase):
         self.assertIsInstance(response.context['form'], ItemForm)
 
     def test_view_saves_item_with_post_request(self):
-        data = {'title': 'Test Item', 'description': 'A test item', 'price': 9.99, 'seller': self.seller1}
+        data = {
+        'title': 'Test Item', 
+        'description': 'A test item', 
+        'price': 9.99, 
+        'name': 'Test Name',
+        'date_joined': timezone.now(),
+        'phone_num': 1234567890,
+        'category':'CLOTHING'
+        }
         self.client.post(reverse('add_item'), data)
         self.assertEqual(Item.objects.count(), 1)
 
@@ -59,11 +68,12 @@ class AddItemTemplateTest(TestCase):
         self.assertContains(response, 'name="title"')
         self.assertContains(response, 'name="description"')
         self.assertContains(response, 'name="price"')
+        self.assertContains(response, 'name="category')
 
 class ItemBuyTest(TestCase):
     def setUp(self):
         self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
-        self.item = Item.objects.create(title="Test Item", description="A test item", price=9.99, is_sold=False, seller = self.seller1)
+        self.item = Item.objects.create(title="Test Item", description="A test item", price=9.99, is_sold=False, seller = self.seller1, category="CLOTHING")
 
     def test_buy_item(self):
         self.client.post(reverse('buy_item', args=(self.item.id,)))
@@ -76,7 +86,7 @@ class RecentlySoldItemsTest(TestCase):
         self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
        
     def test_recently_sold_items_display(self):
-        sold_item = Item.objects.create(title="Sold Item", description="A sold item", price=9.99, is_sold=True, sold_at=timezone.now(), seller = self.seller1)
+        sold_item = Item.objects.create(title="Sold Item", description="A sold item", price=9.99, is_sold=True, sold_at=timezone.now(), seller = self.seller1, category="CLOTHING")
         response = self.client.get(reverse('item_list'))
         self.assertContains(response, sold_item.title)
 
@@ -88,8 +98,8 @@ class CartTests(TestCase):
         self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
         self.seller2 = Seller.objects.create(name = "Test Name1", date_joined=timezone.now(), phone_num = 9876543210)
         # Create some items
-        self.item1 = Item.objects.create(title="Test Item 1", description="Test description 1", price=9.99, seller = self.seller1.id)
-        self.item2 = Item.objects.create(title="Test Item 2", description="Test description 2", price=19.99, seller = self.seller2.id)
+        self.item1 = Item.objects.create(title="Test Item 1", description="Test description 1", price=9.99, seller = self.seller1.id, category="CLOTHING")
+        self.item2 = Item.objects.create(title="Test Item 2", description="Test description 2", price=19.99, seller = self.seller2.id, category="CLOTHING")
         # Log the user in
         self.client = Client()
         self.client.login(username='testuser', password='testpass')
@@ -102,7 +112,7 @@ class CartTests(TestCase):
 class CartTestCase(TestCase):
     def setUp(self):
         self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
-        self.item = Item.objects.create(title="Test Item", price=10.00, seller = self.seller1)
+        self.item = Item.objects.create(title="Test Item", price=10.00, seller = self.seller1, category="CLOTHING")
         
     def test_add_to_cart(self):
         self.client.get(reverse('add_to_cart', args=[self.item.id]))
@@ -207,3 +217,38 @@ class ItemFormTest(TestCase):
             self.assertEqual(Seller.objects.count(), 1)
             self.assertEqual(new_seller.name, 'Test Name')
             self.assertEqual(new_seller.phone_num, 1234567890)
+
+
+class ItemFilterTests(TestCase):
+
+    def setUp(self):
+        # Create a seller
+        self.seller1 = Seller.objects.create(name="Test Seller", date_joined=timezone.now(), phone_num=1234567890)
+
+        # Create items with different categories and sold status
+        Item.objects.create(title="Shirt", category="CLOTHING", is_sold=False, seller=self.seller1, price=19.99, description='A shirt')
+        Item.objects.create(title="Pants", category="CLOTHING", is_sold=True, seller=self.seller1, price=15.99, description='A pair of pants')
+        Item.objects.create(title="Laptop", category="ELECTRONICS", is_sold=False, seller=self.seller1, price=10.99, description='A laptop')
+        Item.objects.create(title="Chair", category="FURNITURE", is_sold=False, seller=self.seller1, price=18.99, description='A chair')
+
+    def test_filter_by_category(self):
+        # Test filtering for clothing, expecting to see 'Shirt' but not 'Pants' or 'Laptop'
+        response_clothing = self.client.get(reverse('item_list') + '?category=CLOTHING')
+        self.assertContains(response_clothing, "Shirt")
+        self.assertNotContains(response_clothing, "Pants")  # Pants are sold
+        self.assertNotContains(response_clothing, "Laptop")  # Laptop is not clothing
+
+        # Test filtering for electronics, expecting to see 'Laptop' but not 'Shirt'
+        response_electronics = self.client.get(reverse('item_list') + '?category=ELECTRONICS')
+        self.assertContains(response_electronics, "Laptop")
+        self.assertNotContains(response_electronics, "Shirt")  # Shirt is clothing
+
+    def test_no_filter(self):
+        # Test with no category filter, expecting to see 'Shirt', 'Laptop', and 'Chair', but not 'Pants'
+        response = self.client.get(reverse('item_list'))
+        self.assertContains(response, "Shirt")
+        self.assertContains(response, "Laptop")
+        self.assertContains(response, "Chair")
+        self.assertNotContains(response, "Pants")  # Pants are sold
+
+    
