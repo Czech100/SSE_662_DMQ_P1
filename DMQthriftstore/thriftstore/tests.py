@@ -252,3 +252,23 @@ class DeleteReviewTest(TestCase):
     def test_delete_entries(self):
         response = self.client.post(reverse('delete_review', args=[self.review.id]))
         self.assertRedirects(response, reverse('item_list'))
+
+    def test_edit_review_view(self):
+        # Get the edit review page
+        response = self.client.get(reverse('edit_review', args=[self.review.id]))
+
+        # Check that the response status code is 200 (OK)
+        self.assertEqual(response.status_code, 200)
+
+        # Check that the 'form' context variable is an instance of ReviewForm
+        self.assertIsInstance(response.context['form'], ReviewForm)
+
+    def test_submit_review_edit_view(self):
+        # Get the edit review page
+        response = self.client.get(reverse('submit_edit_review', args=[self.review.id]))
+
+        # Check that the response status code is 200 (OK)
+        self.assertEqual(response.status_code, 200)
+
+         # Check that the 'review' context variable is an instance of Review
+        self.assertTemplateUsed(response, 'review_form_edit.html')
