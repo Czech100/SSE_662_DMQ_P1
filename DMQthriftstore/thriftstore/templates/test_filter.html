@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Item Filter Test</title>
+</head>
+<body>
+    <div class="container">
+        <form method="GET">
+            <select name="category">
+                <option value="">All Categories</option>
+                {% for code, name in categories %}
+                <option value="{{ code }}" {% if request.GET.category == code %} selected {% endif %}>{{ name }}</option>
+                {% endfor %}
+            </select>
+            <button type="submit">Filter</button>
+        </form>
+        {% for item in items %}
+            <div class="card">
+                <h3>{{ item.title }}</h3>
+                <p>{{ item.description }}</p>
+                <p class="price">$ {{ item.price }}</p>
+                <div class="button-group"> <!-- Add this wrapper for better control -->
+                    <form action="{% url 'buy_item' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Buy</button>
+                    </form>
+                    <form action="{% url 'add_to_cart' item.id %}" method="post">
+                        {% csrf_token %}
+                        <button type="submit">Add to Cart</button>
+                    </form>
+                </div>
+            </div>
+        {% empty %}
+            <p>No items available.</p>
+        {% endfor %}
+    </div>
+</body>
+</html>

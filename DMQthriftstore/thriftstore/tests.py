@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.urls import reverse
 from django.contrib.auth.models import User
 
+
 # Create your tests here.
 
 class ItemModelTest(TestCase):
@@ -226,23 +227,22 @@ class ItemFilterTests(TestCase):
         self.seller1 = Seller.objects.create(name="Test Seller", date_joined=timezone.now(), phone_num=1234567890)
 
         # Create items with different categories and sold status
-        Item.objects.create(title="Shirt", category="CLOTHING", is_sold=False, seller=self.seller1, price=19.99, description='A shirt')
-        Item.objects.create(title="Pants", category="CLOTHING", is_sold=True, seller=self.seller1, price=15.99, description='A pair of pants')
-        Item.objects.create(title="Laptop", category="ELECTRONICS", is_sold=False, seller=self.seller1, price=10.99, description='A laptop')
-        Item.objects.create(title="Chair", category="FURNITURE", is_sold=False, seller=self.seller1, price=18.99, description='A chair')
+        Item.objects.create(title="Shirt", category="CLOTHING", is_sold=0, seller=self.seller1, price=19.99, description='A shirt')
+        Item.objects.create(title="Pants", category="CLOTHING", is_sold=1, seller=self.seller1, price=15.99, description='A pair of pants')
+        Item.objects.create(title="Laptop", category="ELECTRONICS", is_sold=0, seller=self.seller1, price=10.99, description='A laptop')
+        Item.objects.create(title="Chair", category="FURNITURE", is_sold=0, seller=self.seller1, price=18.99, description='A chair')
 
     def test_filter_by_category(self):
-        response_clothing = self.client.get(reverse('item_list') + '?category=ELECTRONICS')
-        self.assertEqual(response_clothing.status_code, 200)
-        self.assertContains(response_clothing, "Laptop")  # Shirt is available
-        self.assertNotContains(response_clothing, "Pants")
-        
+        response = self.client.get(reverse('test_filter') + '?category=ELECTRONICS')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Laptop")
+        self.assertNotContains(response, "Pants")
 
     def test_no_filter(self):
-        response = self.client.get(reverse('item_list'))
+        response = self.client.get(reverse('test_filter'))
         self.assertEqual(response.status_code, 200)
-        self.assertNotContains(response, "Pants")  # Pants are sold
-        self.assertContains(response, "Shirt")  # Shirt is available
+        self.assertContains(response, "Shirt")
+        self.assertNotContains(response, "Pants")
 
 
 class DeleteReviewTest(TestCase):

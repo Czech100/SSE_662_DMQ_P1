@@ -161,7 +161,7 @@
         <div>
             <p>{{ review.comment }}</p>
             <div class="button-group"> <!-- Add this wrapper for better control -->
-                <form action="{% url 'submit_edit_review' review.id %}" method="post">
+                <form action="{% url 'submit_edit_review' review.id|urlencode %}" method="post">
                     {% csrf_token %}
                     <button type="submit">Edit</button>
                 </form>

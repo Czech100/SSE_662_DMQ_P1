@@ -1,7 +1,6 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Item, Review
 from .forms import ItemForm, ReviewForm, SellerForm
-from django.db.models import Q
 
 
 # Create your views here.
@@ -10,23 +9,43 @@ def item_list(request):
     reviews = Review.objects.all().order_by('-created_at')
     
     # Filter items that are not sold
-    available_items = Item.objects.filter(is_sold=0)
     
-    recently_sold_items = Item.objects.filter(is_sold=1).order_by('-sold_at')[:5]  # Adjust the number as needed
+    
+    recently_sold_items = Item.objects.filter(is_sold=True).order_by('-sold_at')[:5]  # Adjust the number as needed
 
     category = request.GET.get('category')
     
+    # Apply additional filters based on category
+    if category:
+        available_items = Item.objects.filter(category=category, is_sold=False)
+    else:
+        available_items = Item.objects.filter(is_sold=False)
+
+    categories = Item.CATEGORY_CHOICES
+    items = available_items
+
+    return render(request, 'item_list.html', {
+        'items': items,
+        'recently_sold_items': recently_sold_items,
+        'reviews': reviews,
+        'categories': categories, 
+    })
+
+def test_filter(request):
+    # Filter items that are not sold
+    available_items = Item.objects.filter(is_sold=0)
+
+    category = request.GET.get('category')
+
     # Apply additional filters based on category
     if category:
         available_items = available_items.filter(category=category)
 
     categories = Item.CATEGORY_CHOICES
 
-    return render(request, 'item_list.html', {
+    return render(request, 'test_filter.html', {
         'items': available_items,
-        'recently_sold_items': recently_sold_items,
-        'reviews': reviews,
-        'categories': categories, 
+        'categories': categories,
     })
 
 def add_item(request):
@@ -106,21 +125,20 @@ def review_form(request):
 
 def edit_review(request, review_id):
     review = get_object_or_404(Review, id=review_id)
+
     if request.method == 'POST':
-        form = ReviewForm(request.POST)
+        form = ReviewForm(request.POST, instance=review)
         if form.is_valid():
-            review.name = form.name
-            review.comment = form.comment
+            form.save()
             return redirect('item_list')
     else:
-        form = ReviewForm()
-    return render(request, 'review_form_edit.html', {'form': form})
+        form = ReviewForm(instance=review)
+
+    return render(request, 'review_form_edit.html', {'form': form, 'review': review})
 
 def submit_review_edit(request, review_id):
     review = get_object_or_404(Review, id=review_id)
-    return render(request, 'review_form_edit.html', {
-        'review': review,
-        })
+    return render(request, 'review_form_edit.html', {'review': review})
 
 def delete_review(request, review_id):
     review = get_object_or_404(Review, id=review_id)

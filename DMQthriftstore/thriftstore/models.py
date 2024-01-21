@@ -18,7 +18,7 @@ class Item(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     price = models.DecimalField(max_digits=6, decimal_places=2)
-    is_sold = models.BooleanField(default=False)
+    is_sold = models.BooleanField(default=False, null=False, blank=False)
     sold_at = models.DateTimeField(null=True, blank=True)
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
 
