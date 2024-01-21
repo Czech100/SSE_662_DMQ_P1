@@ -16,7 +16,7 @@
             <label for="id_comment">Comment:</label>
             <textarea name="comment" cols="40" rows="10" required="" id="id_comment">{{ review.comment }}</textarea>
         </p>
-        <form action="% url 'edit_review' {{review.id}} % method=post">
+        <form action="{% url 'edit_review' {{review.id}} %}">
             {% csrf_token %}
             <button type="submit">submit</button>
         </form>
