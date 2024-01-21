@@ -1,0 +1,23 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+     <meta charset="UTF-8">
+    <title>Edit Review</title>
+</head>
+<body>
+    <form method="post" action="{% url 'edit_review' review.id %}">
+         {% csrf_token %}
+        <p>
+            <label for="id_name">Name:</label>
+            <input type="text" name="name" maxlength="100" required="" id="id_name" value="{{ review.name }}">
+        </p>
+        <p>
+            <label for="id_comment">Comment:</label>
+            <textarea name="comment" cols="40" rows="10" required="" id="id_comment">{{ review.comment }}</textarea>
+        </p>
+        <button type="submit">Submit</button>
+    </form>
+    <a href="{% url 'item_list' %}">Back to Item List</a>
+</body>
+</html>

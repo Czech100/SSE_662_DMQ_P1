@@ -1,13 +1,38 @@
 from django import forms
-from .models import Item, Review
+from .models import Item, Review, Seller
 
 
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
-        fields = ['title', 'description', 'price']
+        fields = ['title', 'description', 'price', 'category']
+
+    def __init__(self, *args, **kwargs):
+        super(ItemForm, self).__init__(*args, **kwargs)
+        self.seller_form = SellerForm()
+
+    def save(self, commit=True):
+        item = super().save(commit=False)
+
+        seller_form = SellerForm(self.data)
+        if seller_form.is_valid():
+            seller = seller_form.save()
+            item.seller = seller
+
+        if commit:
+            item.save()
+
+        return item
 
 class ReviewForm(forms.ModelForm):
     class Meta:
         model = Review
         fields = ['name', 'comment']
+
+class SellerForm(forms.ModelForm):
+    class Meta:
+        model = Seller
+        fields = ['name', 'date_joined', 'phone_num']
+        widgets = {
+            'date_joined': forms.DateInput(attrs={'type': 'date'})
+        }
