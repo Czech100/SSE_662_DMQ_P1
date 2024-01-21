@@ -245,5 +245,10 @@ class ItemFilterTests(TestCase):
         self.assertContains(response, "Shirt")  # Shirt is available
 
 
+class DeleteReviewTest(TestCase):
+    def setUp(self):
+        self.review = Review.objects.create(name="Test Name", comment="Test Comment", created_at=timezone.now())
 
-    
+    def test_delete_entries(self):
+        response = self.client.post(reverse('delete_review', args=[self.review.id]))
+        self.assertRedirects(response, reverse('item_list'))
