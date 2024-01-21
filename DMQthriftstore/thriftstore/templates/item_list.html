@@ -158,7 +158,19 @@
 {% for review in reviews %}
     <div class="review">
         <p><strong>{{ review.name }}</strong> ({{ review.created_at|date:"Y-m-d H:i" }})</p>
-        <p>{{ review.comment }}</p>
+        <div>
+            <p>{{ review.comment }}</p>
+            <div class="button-group"> <!-- Add this wrapper for better control -->
+                <form action="{% url 'submit_edit_review' review.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Edit</button>
+                </form>
+                <form action="{% url 'delete_review' review.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
     </div>
 {% empty %}
     <p>No reviews yet.</p>
