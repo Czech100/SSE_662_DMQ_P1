@@ -33,3 +33,6 @@ class SellerForm(forms.ModelForm):
     class Meta:
         model = Seller
         fields = ['name', 'date_joined', 'phone_num']
+        widgets = {
+            'date_joined': forms.DateInput(attrs={'type': 'date'})
+        }

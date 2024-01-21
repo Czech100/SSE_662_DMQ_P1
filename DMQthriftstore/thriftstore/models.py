@@ -22,6 +22,7 @@ class Item(models.Model):
     sold_at = models.DateTimeField(null=True, blank=True)
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)
 
+
     CATEGORY_CHOICES = (
         ('CLOTHING', 'Clothing'),
         ('ELECTRONICS', 'Electronics'),
@@ -35,6 +36,7 @@ class Item(models.Model):
         self.is_sold = True
         self.sold_at = timezone.now()
         self.save()
+
 
 
 class Review(models.Model):

@@ -12,7 +12,7 @@ def item_list(request):
     # Filter items that are not sold
     available_items = Item.objects.filter(is_sold=0)
     
-    recently_sold_items = Item.objects.filter(is_sold=0).order_by('-sold_at')[:5]  # Adjust the number as needed
+    recently_sold_items = Item.objects.filter(is_sold=1).order_by('-sold_at')[:5]  # Adjust the number as needed
 
     category = request.GET.get('category')
     
