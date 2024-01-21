@@ -106,16 +106,20 @@ def review_form(request):
 
 def edit_review(request, review_id):
     review = get_object_or_404(Review, id=review_id)
-    return redirect('item_list')
+    if request.method == 'POST':
+        form = ReviewForm(request.POST)
+        if form.is_valid():
+            review.name = form.name
+            review.comment = form.comment
+            return redirect('item_list')
+    else:
+        form = ReviewForm()
+    return render(request, 'review_form_edit.html', {'form': form})
 
 def submit_review_edit(request, review_id):
-    review_name = get_object_or_404(Review, id=review_id).name
-    review_comment = get_object_or_404(Review, id=review_id).comment
-    review_id = review_id
+    review = get_object_or_404(Review, id=review_id)
     return render(request, 'review_form_edit.html', {
-        'review_name': review_name,
-        'review_comment': review_comment,
-        'review_id': review_id
+        'review': review,
         })
 
 def delete_review(request, review_id):

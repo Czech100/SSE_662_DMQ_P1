@@ -10,13 +10,13 @@
         {% csrf_token %}
         <p>
             <label for="id_name">Name:</label>
-            <input type="text" name="name" maxlength="100" required="" id="id_name" value= "{{ review_name }}">
+            <input type="text" name="name" maxlength="100" required="" id="id_name" value= "{{ review.name }}">
         </p>
         <p>    
             <label for="id_comment">Comment:</label>
-            <textarea name="comment" cols="40" rows="10" required="" id="id_comment">{{ review_comment }}</textarea>
+            <textarea name="comment" cols="40" rows="10" required="" id="id_comment">{{ review.comment }}</textarea>
         </p>
-        <form action="% url 'edit_review' {{review.id}} %" method="post">
+        <form action="% url 'edit_review' {{review.id}} % method=post">
             {% csrf_token %}
             <button type="submit">submit</button>
         </form>
