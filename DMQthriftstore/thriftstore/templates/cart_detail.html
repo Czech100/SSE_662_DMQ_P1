@@ -1,36 +1,179 @@
-<!-- templates/thriftstore/cart_detail.html -->
+{% load static %}
+<!DOCTYPE html>
+<html>
 <head>
-    <!-- ... other head elements ... -->
-
+    <link rel="shortcut icon" href="{% static 'thrift-shop.png' %}" type="image/x-icon">
     <style>
-        .back-to-list-button {
-            display: inline-block;
+        /* Add a header section */
+        header {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #131A22;
+            color: #fff;
+            padding: 20px;
+        }
+
+        header h1 {
+            margin: 0;
+            flex:1;
+        }
+
+        header nav {
+            display: flex;
+            align-items: center;
+        }
+
+        /* Style the navigation links */
+        header nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 20px;
+        }
+
+        header nav a:hover {
+            text-decoration: underline;
+        }
+
+        /* Style the sidebar */
+        aside {
+            background-color: #f0f0f0;
+            padding: 20px;
             margin-top: 20px;
-            padding: 10px 20px;
+        }
+
+        aside h3 {
+            margin-top: 0;
+        }
+
+        aside ul {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        aside li {
+            margin-bottom: 10px;
+        }
+
+        aside a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        aside a:hover {
+            text-decoration: underline;
+        }
+
+        /* Use a table layout for the cart items */
+        .cart-items {
+            display: table;
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .cart-item {
+            background-color: #fff;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: table-row;
+        }
+
+        .cart-item img {
+            width: 100px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .cart-item h3 {
+            margin-top: 0;
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .cart-item p {
+            margin-bottom: 0;
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        /* Style the checkout form */
+        form.checkout {
+            margin-top: 20px;
+        }
+
+        form.checkout label {
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        form.checkout input[type="text"], form.checkout input[type="email"], form.checkout textarea {
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        form.checkout input[type="submit"] {
             background-color: #007bff;
             color: white;
-            text-decoration: none; /* Remove underline from link */
+            padding: 10px 20px;
+            border: none;
             border-radius: 5px;
-            text-align: center;
+            cursor: pointer;
         }
-        .back-to-list-button:hover {
+
+        form.checkout input[type="submit"]:hover {
             background-color: #0056b3;
         }
     </style>
 </head>
-<h2>Your Cart</h2>
-<div>
-    {% for item in items %}
-    <p>{{ item.title }} - ${{ item.price }}</p>
-    <!-- Add quantity if needed -->
-    <a href="{% url 'remove_from_cart' item.id %}">Remove from Cart</a>
-    {% empty %}
-    <p>Your cart is empty.</p>
-    {% endfor %}
-</div>
-<form action="{% url 'item_list' %}">
-    <button type="submit" class="back-to-list-button">Back to Item List</button>
-</form>
-<form action="{% url 'checkout' %}">
-    <button type="submit" class="back-to-list-button">Checkout</button>
-</form>
+<body>
+    <header>
+        <h1>Thrift Store</h1>
+        <nav>
+            <ul>
+                <li><a href="{% url 'cart_detail' %}">Your Cart</a></li>
+                <li><a href="{% url 'item_list' %}">Item List</a></li>
+            </ul>
+        </nav>
+    </header>
+    <aside>
+        <h3>Your Account</h3>
+        <ul>
+            <li><a href="#">Sign In</a></li>
+            <li><a href="#">Your Orders</a></li>
+            <li><a href="#">Your Wish List</a></li>
+            <li><a href="#">Your Account</a></li>
+            <li><a href="#">Sign Out</a></li>
+        </ul>
+    </aside>
+    <div class="cart-items">
+        {% for item in items %}
+        <div class="cart-item">
+            <img src="{{ item.image_url }}" alt="{{ item.title }}">
+            <h3>{{ item.title }}</h3>
+            <p>${{ item.price }}</p>
+            <a href="{% url 'remove_from_cart' item.id %}">Remove from Cart</a>
+        </div>
+        {% empty %}
+        <p>Your cart is empty.</p>
+        {% endfor %}
+    </div>
+    <form class="checkout" action="{% url 'checkout' %}" method="post">
+        {% csrf_token %}
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required>
+        <label for="address">Address:</label>
+        <textarea id="address" name="address" required></textarea>
+        <input type="submit" value="Checkout">
+    </form>
+</body>
+</html>

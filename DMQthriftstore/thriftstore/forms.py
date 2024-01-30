@@ -1,7 +1,6 @@
 from django import forms
 from .models import Item, Review, Seller
 
-
 class ItemForm(forms.ModelForm):
     class Meta:
         model = Item
@@ -36,3 +35,8 @@ class SellerForm(forms.ModelForm):
         widgets = {
             'date_joined': forms.DateInput(attrs={'type': 'date'})
         }
+
+    def __init__(self, *args, **kwargs):
+        super(SellerForm, self).__init__(*args, **kwargs)
+        self.fields['name'].required = True
+        self.fields['phone_num'].required = True
