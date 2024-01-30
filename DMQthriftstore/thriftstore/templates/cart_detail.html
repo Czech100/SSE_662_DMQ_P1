@@ -4,132 +4,153 @@
 <head>
     <link rel="shortcut icon" href="{% static 'thrift-shop.png' %}" type="image/x-icon">
     <style>
-        /* Add a header section */
+        /* Base styling */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+        }
+    
+        /* Header styling for a modern look */
         header {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
-            background-color: #131A22;
-            color: #fff;
-            padding: 20px;
+            background-color: #fff;
+            color: #333;
+            padding: 10px 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
+    
         header h1 {
             margin: 0;
-            flex:1;
         }
-
-        header nav {
+    
+        /* Improved navigation styling */
+        header nav ul {
+            list-style: none;
             display: flex;
-            align-items: center;
+            margin: 0;
+            padding: 0;
         }
-
-        /* Style the navigation links */
+    
         header nav a {
-            color: #fff;
+            color: #333;
             text-decoration: none;
-            margin-left: 20px;
+            margin: 0 10px;
+            padding: 5px 10px;
+            transition: color 0.3s ease;
         }
-
+    
         header nav a:hover {
-            text-decoration: underline;
+            color: #0056b3;
+            text-decoration: none;
         }
-
-        /* Style the sidebar */
+    
+        /* Sidebar styling */
         aside {
-            background-color: #f0f0f0;
+            background-color: #fff;
             padding: 20px;
-            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
+    
         aside h3 {
+            color: #333;
             margin-top: 0;
         }
-
+    
         aside ul {
             list-style-type: none;
             padding: 0;
-            margin: 0;
         }
-
-        aside li {
-            margin-bottom: 10px;
+    
+        aside li + li {
+            margin-top: 10px;
         }
-
+    
         aside a {
             color: #333;
             text-decoration: none;
+            transition: color 0.3s ease;
         }
-
+    
         aside a:hover {
+            color: #0056b3;
             text-decoration: underline;
         }
-
-        /* Use a table layout for the cart items */
+    
+        /* Cart items styling */
         .cart-items {
-            display: table;
-            width: 100%;
-            border-collapse: collapse;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             margin-top: 20px;
         }
-
+    
         .cart-item {
             background-color: #fff;
+            padding: 15px;
+            border: 1px solid #eaeaea;
             border-radius: 5px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding: 20px;
-            display: table-row;
+            display: flex;
+            align-items: center;
+            gap: 15px;
         }
-
+    
         .cart-item img {
-            width: 100px;
+            max-width: 80px;
             border-radius: 5px;
-            margin-bottom: 10px;
-            display: table-cell;
-            vertical-align: middle;
         }
-
+    
         .cart-item h3 {
-            margin-top: 0;
-            display: table-cell;
-            vertical-align: middle;
+            margin: 0;
+            flex-grow: 1;
         }
-
+    
         .cart-item p {
-            margin-bottom: 0;
-            display: table-cell;
-            vertical-align: middle;
+            margin: 0;
         }
-
-        /* Style the checkout form */
+    
+        .cart-item a {
+            color: #007bff;
+            text-decoration: none;
+        }
+    
+        .cart-item a:hover {
+            text-decoration: underline;
+        }
+    
+        /* Checkout form styling */
         form.checkout {
+            background-color: #fff;
+            padding: 20px;
             margin-top: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-
-        form.checkout label {
-            display: block;
-            margin-bottom: 10px;
-        }
-
-        form.checkout input[type="text"], form.checkout input[type="email"], form.checkout textarea {
+    
+        form.checkout input[type="text"], 
+        form.checkout input[type="email"], 
+        form.checkout textarea {
             width: 100%;
             padding: 10px;
             border-radius: 5px;
             border: 1px solid #ccc;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
-
+    
         form.checkout input[type="submit"] {
-            background-color: #007bff;
+            background-color: #0056b3;
             color: white;
             padding: 10px 20px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            transition: background-color 0.3s ease;
         }
-
+    
         form.checkout input[type="submit"]:hover {
-            background-color: #0056b3;
+            background-color: #003d82;
         }
     </style>
 </head>

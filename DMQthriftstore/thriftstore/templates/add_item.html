@@ -9,6 +9,66 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="{% static 'css/custom.css' %}">
     <link href="https://fonts.googleapis.com/css?family=Roboto:400,500&display=swap" rel="stylesheet">
+    <style>
+        /* Override Bootstrap's styles with custom styles for a more modern look */
+    
+        body {
+            background-color: #f4f4f4; /* Light grey background for the whole page */
+            font-family: 'Roboto', sans-serif; /* Consistent font */
+        }
+    
+        .container {
+            background: #fff; /* White background for the container */
+            padding: 2rem;
+            border-radius: 0.5rem;
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1); /* Soft shadow for depth */
+            margin-top: 3rem; /* More space at the top */
+        }
+    
+        h1 {
+            color: #333; /* Dark grey color for headers */
+        }
+    
+        .form-group label {
+            color: #555; /* Slightly lighter color for labels */
+            font-weight: 500; /* Medium font weight for form labels */
+        }
+    
+        .form-control {
+            border-radius: 0.25rem; /* Slightly round borders for input fields */
+            border: 1px solid #ddd; /* Light border for inputs */
+        }
+    
+        .btn-success {
+            background-color: #0056b3; /* Use brand's primary color */
+            border: none; /* Remove border */
+            padding: 0.75rem 1.5rem; /* Larger padding for buttons */
+            margin-top: 1rem; /* Space above the button */
+            box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1); /* Button shadow for depth */
+        }
+    
+        .btn-success:hover {
+            background-color: #003d82; /* Darker shade on hover */
+        }
+    
+        .btn-secondary {
+            background-color: #6c757d; /* Secondary button color */
+            border: none; /* Remove border */
+            padding: 0.75rem 1.5rem; /* Consistent padding with success button */
+        }
+    
+        .btn-secondary:hover {
+            background-color: #545b62; /* Darker shade on hover */
+        }
+    
+        /* Custom styles for the form's responsive layout */
+        @media (min-width: 768px) {
+            .col-md-6 {
+                padding: 0 1rem; /* Spacing between form columns */
+            }
+        }
+    </style>
+    
 </head>
 <body>
     <div class="container">
