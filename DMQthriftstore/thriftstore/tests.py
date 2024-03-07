@@ -8,6 +8,33 @@ from django.contrib.auth.models import User
 
 # Create your tests here.
 
+class SellerFactory:
+    @staticmethod
+    def create_seller(**kwargs):
+        defaults = {
+            'name': 'Default Seller Name',
+            'date_joined': timezone.now(),
+            'phone_num': 1234567890,
+        }
+        defaults.update(kwargs)
+        return Seller.objects.create(**defaults)
+    
+
+class ItemFactory:
+    @staticmethod
+    def create_item(seller=None, **kwargs):
+        if seller is None:
+            seller = SellerFactory.create_seller()
+        defaults = {
+            'title': 'Default Item Title',
+            'description': 'Default item description',
+            'price': 9.99,
+            'category': 'CLOTHING',
+            'seller': seller,
+        }
+        defaults.update(kwargs)
+        return Item.objects.create(**defaults)
+
 class ItemModelTest(TestCase):
     def setUp(self):
         self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
@@ -73,9 +100,8 @@ class AddItemTemplateTest(TestCase):
 
 class ItemBuyTest(TestCase):
     def setUp(self):
-        self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
-        self.item = Item.objects.create(title="Test Item", description="A test item", price=9.99, is_sold=False, seller = self.seller1, category="CLOTHING")
-
+        self.seller1 = SellerFactory.create_seller(name="Test Name", phone_num=1234567890)
+        self.item = ItemFactory.create_item(title="Test Item", description="Just a test item.", price=9.99, seller=self.seller1, category="CLOTHING")
     def test_buy_item(self):
         self.client.post(reverse('buy_item', args=(self.item.id,)))
         updated_item = Item.objects.get(id=self.item.id)

@@ -1,9 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Item, Review
 from .forms import ItemForm, ReviewForm, SellerForm
-
+from .cart_manager import CartManager
 
 # Create your views here.
+
+
+def get_filtered_items(category=None):
+    if category:
+        return Item.objects.filter(category=category, is_sold=False)
+    return Item.objects.filter(is_sold=False)
+
 
 def item_list(request):
     reviews = Review.objects.all().order_by('-created_at')
@@ -15,14 +22,9 @@ def item_list(request):
 
     category = request.GET.get('category')
     
-    # Apply additional filters based on category
-    if category:
-        available_items = Item.objects.filter(category=category, is_sold=False)
-    else:
-        available_items = Item.objects.filter(is_sold=False)
 
     categories = Item.CATEGORY_CHOICES
-    items = available_items
+    items = get_filtered_items(category)
 
     return render(request, 'item_list.html', {
         'items': items,
@@ -68,50 +70,30 @@ def add_item(request):
 
 def buy_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
-    item.mark_as_sold()
-    
+    mark_item_as_sold(item)
     return redirect('item_list')
+
+def mark_item_as_sold(item):
+    item.mark_as_sold()
 
 
 def add_to_cart(request, item_id):
-    item = get_object_or_404(Item, id=item_id)
-    cart = request.session.get('cart', {})
-    
-    # Add item to cart or update quantity
-    if item_id in cart:
-        cart[item_id] += 1
-    else:
-        cart[item_id] = 1
-    
-    request.session['cart'] = cart
+    CartManager(request.session).update(item_id, action='add')
     return redirect('item_list')
 
+def remove_from_cart(request, item_id):
+    CartManager(request.session).update(item_id, action='remove')
+    return redirect('cart_detail')
+
 def cart_detail(request):
-    item_ids = request.session.get('cart', {}).keys()
+    cart_manager = CartManager(request.session)
+    item_ids = cart_manager.get_items().keys()
     items = Item.objects.filter(id__in=item_ids, is_sold=False)
     return render(request, 'cart_detail.html', {'items': items})
 
 def checkout(request):
-    cart = request.session.get('cart', {})
-    
-    if cart:
-        items = Item.objects.filter(id__in=cart.keys(), is_sold=False)
-        for item in items:
-            item.mark_as_sold()
-            item.save()
-        del request.session['cart']  # Clear the cart after checkout
-    
+    CartManager(request.session).checkout()
     return redirect('item_list')
-
-def remove_from_cart(request, item_id):
-    cart = request.session.get('cart', {})
-    item_id_str = str(item_id)
-
-    if item_id_str in cart:
-        del cart[item_id_str]
-        request.session['cart'] = cart
-
-    return redirect('cart_detail')
 
 def review_form(request):
     if request.method == 'POST':
