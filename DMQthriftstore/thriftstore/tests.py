@@ -196,8 +196,8 @@ class ReviewFormTests(TestCase):
         # Check if the review was created
         self.assertEqual(Review.objects.count(), 1)
         review = Review.objects.first()
-        self.assertEqual(review.name, 'Test User')
-        self.assertEqual(review.comment, 'This is a test review.')
+        self.assertEqual(review.name, form_data.get('name')) 
+        self.assertEqual(review.comment, form_data.get('comment'))
 
 class ItemListPageTests(TestCase):
 
@@ -237,13 +237,13 @@ class ItemFormTest(TestCase):
 
     def test_form_saves_seller(self):
         #Check if SellerForm saves the Seller to database
-        form_data = {'name': 'Test Name', 'date_joined': timezone.now(), 'phone_num': 1234567890}
+        form_data = {'name': 'Test Name', 'date_joined': timezone.now(), 'phone_num': '1234567890'}
         form = SellerForm(data=form_data)
         if form.is_valid():
             new_seller = form.save() 
             self.assertEqual(Seller.objects.count(), 1)
-            self.assertEqual(new_seller.name, 'Test Name')
-            self.assertEqual(new_seller.phone_num, 1234567890)
+            self.assertEqual(new_seller.name, form_data.get('name'))
+            self.assertEqual(new_seller.phone_num, form_data.get('phone_num'))
 
 
 class ItemFilterTests(TestCase):
