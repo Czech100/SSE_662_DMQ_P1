@@ -34,13 +34,14 @@ class ItemFactory:
         }
         defaults.update(kwargs)
         return Item.objects.create(**defaults)
+    
 
 class ItemModelTest(TestCase):
     def setUp(self):
-        self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
+        self.seller1 = SellerFactory.create_seller()
 
     def test_item_creation(self):
-        item = Item.objects.create(title="Test Item", description = "Just a test item.", price=9.99, seller = self.seller1, category="CLOTHING")
+        item = ItemFactory.create_item(self.seller1)
         self.assertEqual(item.title, "Test Item")
         self.assertEqual(item.description, "Just a test item.")
         self.assertEqual(item.price, 9.99)
