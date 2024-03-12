@@ -3,29 +3,24 @@ from .models import Item, Review
 from .forms import ItemForm, ReviewForm, SellerForm
 from .cart_manager import CartManager
 
-# Create your views here.
-
-
 def get_filtered_items(category=None):
+    # Retrieve items filtered by category if provided, and not sold
     if category:
         return Item.objects.filter(category=category, is_sold=False)
     return Item.objects.filter(is_sold=False)
 
-
 def item_list(request):
-    reviews = Review.objects.all().order_by('-created_at')
+    # View to display a list of items, filtering functionality, and recent reviews
+    reviews = Review.objects.all().order_by('-created_at')  # Latest reviews first
     
-    # Filter items that are not sold
-    
-    
-    recently_sold_items = Item.objects.filter(is_sold=True).order_by('-sold_at')[:5]  # Adjust the number as needed
+    # Filter for recently sold items
+    recently_sold_items = Item.objects.filter(is_sold=True).order_by('-sold_at')[:5]  # Last 5 sold items
 
-    category = request.GET.get('category')
-    
+    category = request.GET.get('category')  # Get category from request for filtering
+    categories = Item.CATEGORY_CHOICES  # All available categories
+    items = get_filtered_items(category)  # Filtered items based on the category
 
-    categories = Item.CATEGORY_CHOICES
-    items = get_filtered_items(category)
-
+    # Render the item list page with the context containing items, categories, and reviews
     return render(request, 'item_list.html', {
         'items': items,
         'recently_sold_items': recently_sold_items,
@@ -33,91 +28,82 @@ def item_list(request):
         'categories': categories, 
     })
 
-def test_filter(request):
-    # Filter items that are not sold
-    available_items = Item.objects.filter(is_sold=0)
-
-    category = request.GET.get('category')
-
-    # Apply additional filters based on category
-    if category:
-        available_items = available_items.filter(category=category)
-
-    categories = Item.CATEGORY_CHOICES
-
-    return render(request, 'test_filter.html', {
-        'items': available_items,
-        'categories': categories,
-    })
-
 def add_item(request):
+    # View for adding a new item, handles both GET (form display) and POST (form submission)
     if request.method == "POST":
         item_form = ItemForm(request.POST)
         seller_form = SellerForm(request.POST)
 
         if item_form.is_valid() and seller_form.is_valid():
-            seller = seller_form.save()  # Create and save the Seller instance
-            item = item_form.save(commit=False)  # Create the Item instance but don't save it yet
-            item.seller = seller  # Associate the item with the seller
-            item.save()  # Save the Item instance with the seller reference
+            seller = seller_form.save()  # Save seller information
+            item = item_form.save(commit=False)  # Create item instance without saving
+            item.seller = seller  # Link item with its seller
+            item.save()  # Save the item to the database
 
-            return redirect('item_list')  # Redirect to the list view
+            return redirect('item_list')  # Redirect to item list after saving
     else:
-        item_form = ItemForm()
+        item_form = ItemForm()  # Empty form for GET request
         seller_form = SellerForm()
 
+    # Render the add item page with empty or prefilled forms
     return render(request, 'add_item.html', {'item_form': item_form, 'seller_form': seller_form})
 
-
 def buy_item(request, item_id):
-    item = get_object_or_404(Item, id=item_id)
-    mark_item_as_sold(item)
-    return redirect('item_list')
+    # View to handle the buying of an item
+    item = get_object_or_404(Item, id=item_id)  # Get the item or show 404 error
+    mark_item_as_sold(item)  # Mark the item as sold
+    return redirect('item_list')  # Redirect to item list
 
 def mark_item_as_sold(item):
+    # Helper function to mark an item as sold
     item.mark_as_sold()
 
-
 def add_to_cart(request, item_id):
-    CartManager(request.session).update(item_id, action='add')
-    return redirect('item_list')
+    # View to add an item to the shopping cart
+    CartManager(request.session).update(item_id, action='add')  # Add item to cart
+    return redirect('item_list')  # Redirect to item list
 
 def remove_from_cart(request, item_id):
-    CartManager(request.session).update(item_id, action='remove')
-    return redirect('cart_detail')
+    # View to remove an item from the shopping cart
+    CartManager(request.session).update(item_id, action='remove')  # Remove item from cart
+    return redirect('cart_detail')  # Redirect to cart detail page
 
 def cart_detail(request):
+    # View to display the contents of the shopping cart
     cart_manager = CartManager(request.session)
     item_ids = cart_manager.get_items().keys()
-    items = Item.objects.filter(id__in=item_ids, is_sold=False)
+    items = Item.objects.filter(id__in=item_ids, is_sold=False)  # Retrieve cart items that are not sold
     return render(request, 'cart_detail.html', {'items': items})
 
 def checkout(request):
-    CartManager(request.session).checkout()
-    return redirect('item_list')
+    # View to handle checkout process
+    CartManager(request.session).checkout()  # Process checkout
+    return redirect('item_list')  # Redirect to item list after checkout
 
 def review_form(request):
+    # View for submitting a new review
     if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
-            form.save()
-            return redirect('item_list')
+            form.save()  # Save the new review
+            return redirect('item_list')  # Redirect to item list
     else:
-        form = ReviewForm()
+        form = ReviewForm()  # Empty form for GET request
     return render(request, 'review_form.html', {'form': form})
 
 def edit_review(request, review_id):
-    review = get_object_or_404(Review, id=review_id)
-
+    # View to edit an existing review
+    review = get_object_or_404(Review, id=review_id)  # Retrieve the review or show 404
     if request.method == 'POST':
         form = ReviewForm(request.POST, instance=review)
         if form.is_valid():
-            form.save()
-            return redirect('item_list')
+            form.save()  # Save the updated review
+            return redirect('item_list')  # Redirect to item list
     else:
-        form = ReviewForm(instance=review)
-
+        form = ReviewForm(instance=review)  # Pre-fill form with review data
     return render(request, 'review_form_edit.html', {'form': form, 'review': review})
+
+# Additional views for submitting review edits, deleting reviews, etc., follow a similar pattern
 
 def submit_review_edit(request, review_id):
     review = get_object_or_404(Review, id=review_id)
