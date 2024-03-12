@@ -11,7 +11,7 @@ PRICE_DECIMAL_PLACES = 2
 
 class Seller(models.Model):
     name = models.CharField(max_length = 40)
-    date_joined = models.DateTimeField()
+    date_joined = models.DateTimeField(auto_now_add=True)
     phone_regex = RegexValidator(regex=r'^\+?1?\d{9,15}$', message="Phone number must be entered in the format: '+999999999'. Up to 15 digits allowed.")
     phone_num = models.CharField(validators=[phone_regex], max_length=17, blank=True)  
 

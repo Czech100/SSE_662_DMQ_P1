@@ -74,7 +74,9 @@ class AddItemViewTest(TestCase):
         response = self.client.get(reverse('add_item'))
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'form')
-        self.assertIsInstance(response.context['form'], ItemForm)
+        self.assertIsInstance(response.context['item_form'], ItemForm)
+        self.assertIsInstance(response.context['seller_form'], SellerForm)
+
 
     def test_view_saves_item_with_post_request(self):
         data = {

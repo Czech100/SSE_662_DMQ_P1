@@ -68,6 +68,7 @@ def add_item(request):
 
     return render(request, 'add_item.html', {'item_form': item_form, 'seller_form': seller_form})
 
+
 def buy_item(request, item_id):
     item = get_object_or_404(Item, id=item_id)
     mark_item_as_sold(item)

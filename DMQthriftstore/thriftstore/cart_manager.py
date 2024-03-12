@@ -1,4 +1,22 @@
+from django.shortcuts import redirect
 from .models import Item
+
+class CheckoutProcess:
+    def __init__(self, cart_manager):
+        self.cart_manager = cart_manager
+    
+    def execute(self):
+        # Retrieve item instances based on IDs stored in the cart
+        item_ids = self.cart_manager.get_items().keys()
+        items = Item.objects.filter(id__in=item_ids, is_sold=False)
+        
+        # Mark each item as sold
+        for item in items:
+            item.is_sold = True
+            item.save()
+        
+        # Clear the cart after marking items as sold
+        self.cart_manager.clear_cart()
 
 
 class CartManager:
@@ -29,9 +47,10 @@ class CartManager:
         self.cart = {}
         self.update_session()
 
-    def checkout(self):
-        Item.objects.filter(id__in=self.cart.keys(), is_sold=False).update(is_sold=True)
-        self.clear_cart()
+    def checkout(request):
+        checkout_process = CheckoutProcess(CartManager(request.session))
+        checkout_process.execute()
+        return redirect('item_list')
 
     def update_session(self):
         self.session['cart'] = self.cart
