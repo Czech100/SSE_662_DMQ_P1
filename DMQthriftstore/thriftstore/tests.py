@@ -51,7 +51,7 @@ class ItemModelTest(TestCase):
 
 class ItemFormTest(TestCase):
     def setUp(self):
-        self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
+        self.seller1 = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
 
     def test_form_validity(self):
         form_data = {'title': 'Test Item', 'description': 'A test item', 'price': 9.99, 'seller': self.seller1, 'category':'CLOTHING'}
@@ -69,7 +69,7 @@ class ItemFormTest(TestCase):
 
 class AddItemViewTest(TestCase):
     def setUp(self):
-        self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
+        self.seller1 = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
 
     def test_view_renders_item_form(self):
         response = self.client.get(reverse('add_item'))
@@ -113,10 +113,10 @@ class ItemBuyTest(TestCase):
 
 class RecentlySoldItemsTest(TestCase):
     def setUp(self):
-        self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
+        self.seller1 = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
        
     def test_recently_sold_items_display(self):
-        sold_item = Item.objects.create(title="Sold Item", description="A sold item", price=9.99, is_sold=True, sold_at=timezone.now(), seller = self.seller1, category="CLOTHING")
+        sold_item = ItemFactory.create_item(title="Sold Item", description="A sold item", price=9.99, is_sold=True, sold_at=timezone.now(), seller = self.seller1, category="CLOTHING")
         response = self.client.get(reverse('item_list'))
         self.assertContains(response, sold_item.title)
 
@@ -125,11 +125,11 @@ class CartTests(TestCase):
         # Create a user
         self.user = User.objects.create_user(username='testuser', password='testpass')
         # Create some sellers
-        self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
-        self.seller2 = Seller.objects.create(name = "Test Name1", date_joined=timezone.now(), phone_num = 9876543210)
+        self.seller1 = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
+        self.seller2 = SellerFactory.create_seller(name = "Test Name1", date_joined=timezone.now(), phone_num = 9876543210)
         # Create some items
-        self.item1 = Item.objects.create(title="Test Item 1", description="Test description 1", price=9.99, seller = self.seller1.id, category="CLOTHING")
-        self.item2 = Item.objects.create(title="Test Item 2", description="Test description 2", price=19.99, seller = self.seller2.id, category="CLOTHING")
+        self.item1 = ItemFactory.create_item(title="Test Item 1", description="Test description 1", price=9.99, seller = self.seller1.id, category="CLOTHING")
+        self.item2 = ItemFactory.create_item(title="Test Item 2", description="Test description 2", price=19.99, seller = self.seller2.id, category="CLOTHING")
         # Log the user in
         self.client = Client()
         self.client.login(username='testuser', password='testpass')
@@ -141,8 +141,9 @@ class CartTests(TestCase):
 
 class CartTestCase(TestCase):
     def setUp(self):
-        self.seller1 = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
-        self.item = Item.objects.create(title="Test Item", price=10.00, seller = self.seller1, category="CLOTHING")
+        self.seller1 = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
+        self.item = ItemFactory.create_item(title="Test Item", price=10.00, seller = self.seller1, category="CLOTHING")
+
         
     def test_add_to_cart(self):
         self.client.get(reverse('add_to_cart', args=[self.item.id]))
@@ -223,7 +224,7 @@ class SellerFormTest(TestCase):
 
     def test_item_creation(self):
         #Check if the Seller was created
-        seller = Seller.objects.create(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
+        seller = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
         self.assertEqual(seller.name, "Test Name")
         self.assertEqual(seller.phone_num, 1234567890)
 
@@ -256,10 +257,10 @@ class ItemFilterTests(TestCase):
         self.seller1 = Seller.objects.create(name="Test Seller", date_joined=timezone.now(), phone_num=1234567890)
 
         # Create items with different categories and sold status
-        Item.objects.create(title="Shirt", category="CLOTHING", is_sold=0, seller=self.seller1, price=19.99, description='A shirt')
-        Item.objects.create(title="Pants", category="CLOTHING", is_sold=1, seller=self.seller1, price=15.99, description='A pair of pants')
-        Item.objects.create(title="Laptop", category="ELECTRONICS", is_sold=0, seller=self.seller1, price=10.99, description='A laptop')
-        Item.objects.create(title="Chair", category="FURNITURE", is_sold=0, seller=self.seller1, price=18.99, description='A chair')
+        SellerFactory.create_seller(title="Shirt", category="CLOTHING", is_sold=0, seller=self.seller1, price=19.99, description='A shirt')
+        SellerFactory.create_seller(title="Pants", category="CLOTHING", is_sold=1, seller=self.seller1, price=15.99, description='A pair of pants')
+        SellerFactory.create_seller(title="Laptop", category="ELECTRONICS", is_sold=0, seller=self.seller1, price=10.99, description='A laptop')
+        SellerFactory.create_seller(title="Chair", category="FURNITURE", is_sold=0, seller=self.seller1, price=18.99, description='A chair')
 
     def test_filter_by_category(self):
         response = self.client.get(reverse('test_filter') + '?category=ELECTRONICS')
