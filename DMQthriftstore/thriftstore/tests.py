@@ -41,7 +41,7 @@ class ItemModelTest(TestCase):
         self.seller1 = SellerFactory.create_seller()
 
     def test_item_creation(self):
-        item = ItemFactory.create_item(self.seller1)
+        item = ItemFactory.create_item(seller=self.seller1, title="Test Item", description="Just a test item.", price=9.99, category="CLOTHING")
         self.assertEqual(item.title, "Test Item")
         self.assertEqual(item.description, "Just a test item.")
         self.assertEqual(item.price, 9.99)
@@ -257,10 +257,10 @@ class ItemFilterTests(TestCase):
         self.seller1 = Seller.objects.create(name="Test Seller", date_joined=timezone.now(), phone_num=1234567890)
 
         # Create items with different categories and sold status
-        SellerFactory.create_seller(title="Shirt", category="CLOTHING", is_sold=0, seller=self.seller1, price=19.99, description='A shirt')
-        SellerFactory.create_seller(title="Pants", category="CLOTHING", is_sold=1, seller=self.seller1, price=15.99, description='A pair of pants')
-        SellerFactory.create_seller(title="Laptop", category="ELECTRONICS", is_sold=0, seller=self.seller1, price=10.99, description='A laptop')
-        SellerFactory.create_seller(title="Chair", category="FURNITURE", is_sold=0, seller=self.seller1, price=18.99, description='A chair')
+        ItemFactory.create_item(title="Shirt", category="CLOTHING", is_sold=0, seller=self.seller1, price=19.99, description='A shirt')
+        ItemFactory.create_item(title="Pants", category="CLOTHING", is_sold=1, seller=self.seller1, price=15.99, description='A pair of pants')
+        ItemFactory.create_item(title="Laptop", category="ELECTRONICS", is_sold=0, seller=self.seller1, price=10.99, description='A laptop')
+        ItemFactory.create_item(title="Chair", category="FURNITURE", is_sold=0, seller=self.seller1, price=18.99, description='A chair')
 
     def test_filter_by_category(self):
         response = self.client.get(reverse('test_filter') + '?category=ELECTRONICS')

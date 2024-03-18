@@ -44,6 +44,8 @@ class Item(models.Model):
     def save(self, *args, **kwargs):
         # Custom save method to ensure price is positive
         assert self.price > 0, "Price must be positive"
+        if self.is_sold and isinstance(self.sold_at, models.DateTimeField):
+            self.sold_at = timezone.now()
         super().save(*args, **kwargs)
 
 # Model for reviews

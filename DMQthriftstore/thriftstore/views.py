@@ -28,6 +28,13 @@ def item_list(request):
         'categories': categories, 
     })
 
+def test_filter(request):
+    category = request.GET.get('category')  # For example, getting a category query parameter from the request
+    items = get_filtered_items(category=category)  # Reusing the existing filtering function
+    
+    # Render a template with the filtered items. You might need to create a specific template for this view.
+    return render(request, 'test_filter.html', {'items': items})
+
 def add_item(request):
     # View for adding a new item, handles both GET (form display) and POST (form submission)
     if request.method == "POST":
