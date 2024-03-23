@@ -254,7 +254,7 @@ class ItemFilterTests(TestCase):
 
     def setUp(self):
         # Create a seller
-        self.seller1 = Seller.objects.create(name="Test Seller", date_joined=timezone.now(), phone_num=1234567890)
+        self.seller1 = SellerFactory.create_seller(name="Test Seller", date_joined=timezone.now(), phone_num=1234567890)
 
         # Create items with different categories and sold status
         ItemFactory.create_item(title="Shirt", category="CLOTHING", is_sold=0, seller=self.seller1, price=19.99, description='A shirt')
