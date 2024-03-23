@@ -120,7 +120,7 @@ class RecentlySoldItemsTest(TestCase): #Tests that the recently sold items retur
         response = self.client.get(reverse('item_list'))
         self.assertContains(response, sold_item.title)
 
-class CartTests(TestCase):
+class CartTests(TestCase): #Sets up for later cart test
     def setUp(self):
         # Create a user
         self.user = User.objects.create_user(username='testuser', password='testpass')
