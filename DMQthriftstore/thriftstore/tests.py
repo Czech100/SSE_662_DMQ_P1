@@ -8,7 +8,7 @@ from django.contrib.auth.models import User
 
 # Create your tests here.
 
-class SellerFactory:
+class SellerFactory: #Creates a seller with default values if there are no arguments. Used to reduce redundant code of set ups.
     @staticmethod
     def create_seller(**kwargs):
         defaults = {
@@ -20,7 +20,7 @@ class SellerFactory:
         return Seller.objects.create(**defaults)
     
 
-class ItemFactory:
+class ItemFactory: #Creates an item with default values if there are no arguments. Used to reduce redundant code of set ups.
     @staticmethod
     def create_item(seller=None, **kwargs):
         if seller is None:
@@ -36,7 +36,7 @@ class ItemFactory:
         return Item.objects.create(**defaults)
     
 
-class ItemModelTest(TestCase):
+class ItemModelTest(TestCase): #Tests that item creation is successful.
     def setUp(self):
         self.seller1 = SellerFactory.create_seller()
 
@@ -49,7 +49,7 @@ class ItemModelTest(TestCase):
         self.assertEqual(item.category, "CLOTHING")
 
 
-class ItemFormTest(TestCase):
+class ItemFormTest(TestCase): #Tests that item is valid after creation and that the item saves correctly.
     def setUp(self):
         self.seller1 = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
 
@@ -67,7 +67,7 @@ class ItemFormTest(TestCase):
             self.assertEqual(new_item.title, 'Test Item')
 
 
-class AddItemViewTest(TestCase):
+class AddItemViewTest(TestCase): #Tests that the view renders the form correctly, and the item saves correctly with POST request.
     def setUp(self):
         self.seller1 = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
 
@@ -93,7 +93,7 @@ class AddItemViewTest(TestCase):
         self.assertEqual(Item.objects.count(), 1)
 
 
-class AddItemTemplateTest(TestCase):
+class AddItemTemplateTest(TestCase): #Tests that the add item template contains all fields. 
     def test_template_displays_form_fields(self):
         response = self.client.get(reverse('add_item'))
         self.assertContains(response, 'name="title"')
@@ -101,7 +101,7 @@ class AddItemTemplateTest(TestCase):
         self.assertContains(response, 'name="price"')
         self.assertContains(response, 'name="category')
 
-class ItemBuyTest(TestCase):
+class ItemBuyTest(TestCase): #Tests buying an item through a POST request.
     def setUp(self):
         self.seller1 = SellerFactory.create_seller(name="Test Name", phone_num=1234567890)
         self.item = ItemFactory.create_item(title="Test Item", description="Just a test item.", price=9.99, seller=self.seller1, category="CLOTHING")
@@ -111,7 +111,7 @@ class ItemBuyTest(TestCase):
         
         self.assertTrue(updated_item.is_sold)
 
-class RecentlySoldItemsTest(TestCase):
+class RecentlySoldItemsTest(TestCase): #Tests that the recently sold items return from a GET request.
     def setUp(self):
         self.seller1 = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
        
@@ -139,11 +139,10 @@ class CartTests(TestCase):
         self.cart_detail_url = reverse('cart_detail')
 
 
-class CartTestCase(TestCase):
+class CartTestCase(TestCase):#Tests adding to the cart, checking out, and removing an item from the cart. 
     def setUp(self):
         self.seller1 = SellerFactory.create_seller(name = "Test Name", date_joined=timezone.now(), phone_num = 1234567890)
         self.item = ItemFactory.create_item(title="Test Item", price=10.00, seller = self.seller1, category="CLOTHING")
-
         
     def test_add_to_cart(self):
         self.client.get(reverse('add_to_cart', args=[self.item.id]))
@@ -182,7 +181,7 @@ class CartTestCase(TestCase):
         cart = session.get('cart', {})
 
 
-class ReviewFormTests(TestCase):
+class ReviewFormTests(TestCase): #Tests that review forms POST correctly with the correct values.
 
     def test_review_form_submission(self):
         # Data for the review form
@@ -203,7 +202,7 @@ class ReviewFormTests(TestCase):
         self.assertEqual(review.name, form_data.get('name')) 
         self.assertEqual(review.comment, form_data.get('comment'))
 
-class ItemListPageTests(TestCase):
+class ItemListPageTests(TestCase): #Tests that reviews display correctly.
 
     def setUp(self):
         # Create some test reviews
@@ -220,7 +219,7 @@ class ItemListPageTests(TestCase):
         self.assertContains(response, 'User 1')
         self.assertContains(response, 'User 2')
 
-class SellerFormTest(TestCase):
+class SellerFormTest(TestCase): #Tests that a seller was created correctly. 
 
     def test_item_creation(self):
         #Check if the Seller was created
@@ -229,7 +228,7 @@ class SellerFormTest(TestCase):
         self.assertEqual(seller.phone_num, 1234567890)
 
 
-class ItemFormTest(TestCase):
+class ItemFormTest(TestCase): #Tests that a seller from is valid and that it saves correctly to database. 
 
 
     def test_form_validity(self):
@@ -250,7 +249,7 @@ class ItemFormTest(TestCase):
             self.assertEqual(new_seller.phone_num, form_data.get('phone_num'))
 
 
-class ItemFilterTests(TestCase):
+class ItemFilterTests(TestCase): #Tests that the item filter is working correctly. 
 
     def setUp(self):
         # Create a seller
@@ -275,7 +274,7 @@ class ItemFilterTests(TestCase):
         self.assertNotContains(response, "Pants")
 
 
-class DeleteReviewTest(TestCase):
+class DeleteReviewTest(TestCase): #Test the deletion and editing of reviews. 
     def setUp(self):
         self.review = Review.objects.create(name="Test Name", comment="Test Comment", created_at=timezone.now())
 
