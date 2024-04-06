@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils import timezone
 from django.core.validators import RegexValidator
+from observers import SoldObserver
 
 # Constants for price field constraints
 PRICE_MAX_DIGITS = 10
@@ -25,6 +26,7 @@ class Item(models.Model):
     is_sold = models.BooleanField(default=False)
     sold_at = models.DateTimeField(null=True, blank=True)  # Timestamp for when the item was sold
     seller = models.ForeignKey(Seller, on_delete=models.CASCADE)  # Link to the Seller model
+    observers = []
 
     # Choices for the category of the item
     CATEGORY_CHOICES = (
@@ -40,6 +42,7 @@ class Item(models.Model):
         self.is_sold = True
         self.sold_at = models.DateTimeField(auto_now_add=True)
         self.save()
+        self.notify_observers()
 
     def save(self, *args, **kwargs):
         # Custom save method to ensure price is positive
@@ -47,6 +50,20 @@ class Item(models.Model):
         if self.is_sold and isinstance(self.sold_at, models.DateTimeField):
             self.sold_at = timezone.now()
         super().save(*args, **kwargs)
+    
+    def notify_observers(self):
+        for observer in self.observers:
+            observer.update(self)
+
+    def attach(self, observer):
+        if observer not in self.observers:
+            self.observers.append(observer)
+
+    def detach(self, observer):
+        try:
+            self.observers.remove(observer)
+        except KeyError:   
+            pass
 
 # Model for reviews
 class Review(models.Model):
