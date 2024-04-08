@@ -1,23 +1,56 @@
 from django.shortcuts import redirect
 from .models import Item
+from decimal import Decimal
 
-# Class to handle the checkout process
-class CheckoutProcess:
-    def __init__(self, cart_manager):
-        self.cart_manager = cart_manager  # An instance of CartManager to manage cart operations
-    
-    def execute(self):
-        # Retrieve item instances based on IDs stored in the cart
-        item_ids = self.cart_manager.get_items().keys()
+
+class CheckoutStrategy:
+    def process_checkout(self, cart_manager):
+        raise NotImplementedError("Subclasses must implement the process_checkout method.")
+
+class StandardCheckout(CheckoutStrategy):
+    def process_checkout(self, cart_manager):
+        item_ids = cart_manager.get_items().keys()
         items = Item.objects.filter(id__in=item_ids, is_sold=False)
-        
-        # Mark each item as sold
         for item in items:
             item.is_sold = True
             item.save()
+        cart_manager.clear_cart()
+
+class DiscountedCheckout(CheckoutStrategy):
+    def process_checkout(self, cart_manager):
+        item_ids = cart_manager.get_items().keys()
+        items = Item.objects.filter(id__in=item_ids, is_sold=False)
         
-        # Clear the cart after marking items as sold
-        self.cart_manager.clear_cart()
+        total_discount = Decimal('0.0')  # Initialize total discount
+
+        for item in items:
+            if item.category == 'CLOTHING':  
+                og_price = item.price 
+                discount = item.price * Decimal('0.2')  # Calculate 20% discount
+                total_discount += discount
+                item.price -= discount  # Apply discount
+                item.is_sold = True
+                item.save()
+                print(f"Item {item.name} sold for {item.price} after a 20% discount. Original price was {og_price}.")
+            else:
+                item.is_sold = True
+                item.save()
+                print(f"Item {item.id} sold for {item.price} with no disocunt.")
+        
+        cart_manager.clear_cart()
+
+        # Optionally, return total discount or other relevant information
+        return total_discount
+
+
+# Class to handle the checkout process
+class CheckoutProcess:
+    def __init__(self, cart_manager,checkout_strategy: CheckoutStrategy):
+        self.cart_manager = cart_manager  # An instance of CartManager to manage cart operations
+        self.checkout_strategy = checkout_strategy  # The strategy to apply during checkout
+    
+    def execute(self):
+        self.checkout_strategy.process_checkout(self.cart_manager)
 
 # Class to manage shopping cart operations
 class CartManager:
@@ -52,12 +85,6 @@ class CartManager:
         # Clear all items from the cart
         self.cart = {}
         self.update_session()
-
-    def checkout(request):
-        # Process checkout: mark items as sold and clear the cart
-        checkout_process = CheckoutProcess(CartManager(request.session))
-        checkout_process.execute()
-        return redirect('item_list')  # Redirect to the item list page after checkout
 
     def update_session(self):
         # Update the session with the current state of the cart

@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import Item, Review
 from .forms import ItemForm, ReviewForm, SellerForm
-from .cart_manager import CartManager
+from .cart_manager import CartManager, StandardCheckout, CheckoutProcess, DiscountedCheckout
 from .observers import ItemSoldNotifier
 
 def get_filtered_items(category=None):
@@ -28,6 +28,7 @@ def item_list(request):
         'reviews': reviews,
         'categories': categories, 
     })
+
 
 def test_filter(request):
     category = request.GET.get('category')  # For example, getting a category query parameter from the request
@@ -88,9 +89,12 @@ def cart_detail(request):
     return render(request, 'cart_detail.html', {'items': items})
 
 def checkout(request):
-    # View to handle checkout process
-    CartManager(request.session).checkout()  # Process checkout
-    return redirect('item_list')  # Redirect to item list after checkout
+    if request.method == "POST":
+        checkout_strategy = DiscountedCheckout()
+        cart_manager = CartManager(request.session)
+        checkout_process = CheckoutProcess(cart_manager, checkout_strategy)
+        checkout_process.execute()
+        return redirect('item_list') 
 
 def review_form(request):
     # View for submitting a new review
