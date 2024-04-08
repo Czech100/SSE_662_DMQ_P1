@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from .models import Item, Review
 from .forms import ItemForm, ReviewForm, SellerForm
 from .cart_manager import CartManager
+from .observers import ItemSoldNotifier
 
 def get_filtered_items(category=None):
     # Retrieve items filtered by category if provided, and not sold
@@ -58,11 +59,15 @@ def add_item(request):
 def buy_item(request, item_id):
     # View to handle the buying of an item
     item = get_object_or_404(Item, id=item_id)  # Get the item or show 404 error
-    mark_item_as_sold(item)  # Mark the item as sold
+    mark_item_as_sold(request, item_id)  # Mark the item as sold
     return redirect('item_list')  # Redirect to item list
 
-def mark_item_as_sold(item):
+def mark_item_as_sold(request, item_id):
     # Helper function to mark an item as sold
+    item = get_object_or_404(Item, pk=item_id)
+    sold_notifier = ItemSoldNotifier()
+    item.attach_observer(sold_notifier)
+
     item.mark_as_sold()
 
 def add_to_cart(request, item_id):
