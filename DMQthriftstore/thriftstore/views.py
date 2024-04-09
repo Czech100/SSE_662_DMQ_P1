@@ -109,9 +109,9 @@ def review_form(request):
     return render(request, 'review_form.html', {'form': form})"""
     
     review_reciever = ReviewReciever()
-    NEW_REVIEW = NewReviewCommand(review_reciever, request)
+    new_review_command = NewReviewCommand(review_reciever, request)
     invoker = Invoker()
-    invoker.register_command("Create Review", NEW_REVIEW)
+    invoker.register_command("Create Review", new_review_command)
     form = invoker.execute("Create Review")
     return render(request, 'review_form.html', {'form': form})
 
