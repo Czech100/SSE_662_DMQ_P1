@@ -3,6 +3,7 @@ from .models import Item, Review
 from .forms import ItemForm, ReviewForm, SellerForm
 from .cart_manager import CartManager, StandardCheckout, CheckoutProcess, DiscountedCheckout
 from .observers import ItemSoldNotifier
+from .commands import ReviewReciever, NewReviewCommand, Invoker
 
 def get_filtered_items(category=None):
     # Retrieve items filtered by category if provided, and not sold
@@ -98,13 +99,20 @@ def checkout(request):
 
 def review_form(request):
     # View for submitting a new review
-    if request.method == 'POST':
+    """if request.method == 'POST':
         form = ReviewForm(request.POST)
         if form.is_valid():
             form.save()  # Save the new review
             return redirect('item_list')  # Redirect to item list
     else:
         form = ReviewForm()  # Empty form for GET request
+    return render(request, 'review_form.html', {'form': form})"""
+    
+    review_reciever = ReviewReciever()
+    NEW_REVIEW = NewReviewCommand(review_reciever, request)
+    invoker = Invoker()
+    invoker.register_command("Create Review", NEW_REVIEW)
+    form = invoker.execute("Create Review")
     return render(request, 'review_form.html', {'form': form})
 
 def edit_review(request, review_id):
