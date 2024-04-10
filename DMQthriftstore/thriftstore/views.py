@@ -3,7 +3,7 @@ from .models import Item, Review
 from .forms import ItemForm, ReviewForm, SellerForm
 from .cart_manager import CartManager, StandardCheckout, CheckoutProcess, DiscountedCheckout
 from .observers import ItemSoldNotifier
-from .commands import ReviewReciever, NewReviewCommand, Invoker
+from .commands import EditReviewCommand, ReviewReciever, NewReviewCommand, Invoker
 
 def get_filtered_items(category=None):
     # Retrieve items filtered by category if provided, and not sold
@@ -113,10 +113,11 @@ def review_form(request):
     invoker = Invoker()
     invoker.register_command("Create Review", new_review_command)
     form = invoker.execute("Create Review")
+    if form == None: return redirect('item_list')
     return render(request, 'review_form.html', {'form': form})
 
 def edit_review(request, review_id):
-    # View to edit an existing review
+    """# View to edit an existing review
     review = get_object_or_404(Review, id=review_id)  # Retrieve the review or show 404
     if request.method == 'POST':
         form = ReviewForm(request.POST, instance=review)
@@ -125,7 +126,15 @@ def edit_review(request, review_id):
             return redirect('item_list')  # Redirect to item list
     else:
         form = ReviewForm(instance=review)  # Pre-fill form with review data
-    return render(request, 'review_form_edit.html', {'form': form, 'review': review})
+    return render(request, 'review_form_edit.html', {'form': form, 'review': review})"""
+
+    review_reciever = ReviewReciever()
+    edit_review_command = EditReviewCommand(review_reciever, request, review_id)
+    invoker = Invoker()
+    invoker.register_command("Edit Review", edit_review_command)
+    form = invoker.execute("Edit Review")
+    if form == None: return redirect('item_list')
+    return render(request, 'review_form.html', {'form': form})
 
 # Additional views for submitting review edits, deleting reviews, etc., follow a similar pattern
 
