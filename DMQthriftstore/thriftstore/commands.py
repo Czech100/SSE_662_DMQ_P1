@@ -15,7 +15,7 @@ class ReviewReciever:
              form = ReviewForm(request.POST)
              if form.is_valid():
                  form.save()  # Save the new review
-                 return None  # Redirect to item list
+                 return None  # Return None so the program redirects to 'item list'
          else:
              print(1)
              form = ReviewForm()  # Empty form for GET request
@@ -28,7 +28,7 @@ class ReviewReciever:
             form = ReviewForm(request.POST, instance=review)
             if form.is_valid():
                 form.save()  # Save the updated review
-                return None  # Redirect to item list
+                return None  # Return None so the program redirects to 'item list'
         else:
             form = ReviewForm(instance=review)  # Pre-fill form with review data
         return form

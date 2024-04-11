@@ -98,16 +98,6 @@ def checkout(request):
         return redirect('item_list') 
 
 def review_form(request):
-    # View for submitting a new review
-    """if request.method == 'POST':
-        form = ReviewForm(request.POST)
-        if form.is_valid():
-            form.save()  # Save the new review
-            return redirect('item_list')  # Redirect to item list
-    else:
-        form = ReviewForm()  # Empty form for GET request
-    return render(request, 'review_form.html', {'form': form})"""
-    
     review_reciever = ReviewReciever()
     new_review_command = NewReviewCommand(review_reciever, request)
     invoker = Invoker()
@@ -117,17 +107,6 @@ def review_form(request):
     return render(request, 'review_form.html', {'form': form})
 
 def edit_review(request, review_id):
-    """# View to edit an existing review
-    review = get_object_or_404(Review, id=review_id)  # Retrieve the review or show 404
-    if request.method == 'POST':
-        form = ReviewForm(request.POST, instance=review)
-        if form.is_valid():
-            form.save()  # Save the updated review
-            return redirect('item_list')  # Redirect to item list
-    else:
-        form = ReviewForm(instance=review)  # Pre-fill form with review data
-    return render(request, 'review_form_edit.html', {'form': form, 'review': review})"""
-
     review_reciever = ReviewReciever()
     edit_review_command = EditReviewCommand(review_reciever, request, review_id)
     invoker = Invoker()
