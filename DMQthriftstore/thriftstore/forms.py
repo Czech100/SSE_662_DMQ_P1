@@ -12,12 +12,11 @@ class ItemForm(forms.ModelForm):
         self.seller_form = SellerForm()  # Initialize a SellerForm for seller information
 
     def save(self, commit=True):
-        item = super().save(commit=False)  # Save the form's data into an Item instance without committing to the database
+        seller = self.seller_form.save(commit=False)
+        seller.save()
 
-        seller_form = SellerForm(self.data)
-        if seller_form.is_valid():
-            seller = seller_form.save()  # Save the seller form data
-            item.seller = seller  # Link the item to its seller
+        item = super().save(commit=False)
+        item.seller = seller
 
         if commit:
             item.save()  # Commit the item to the database

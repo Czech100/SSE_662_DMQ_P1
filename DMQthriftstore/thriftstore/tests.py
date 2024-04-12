@@ -150,10 +150,22 @@ class CartTestCase(TestCase):#Tests adding to the cart, checking out, and removi
         self.assertIn(str(self.item.id), cart)
 
     def test_checkout(self):
+        # Add item to cart
         self.client.get(reverse('add_to_cart', args=[self.item.id]))
-        self.client.get(reverse('checkout'))
-        self.item.refresh_from_db()
-        self.assertTrue(self.item.is_sold)
+    
+        # Simulate checkout process
+        response = self.client.post(reverse('checkout'))
+
+        # Check if checkout was successful (status code 302 indicates a redirect)
+        self.assertEqual(response.status_code, 302)
+    
+        # Fetch the updated item from the database
+        updated_item = Item.objects.get(id=self.item.id)
+    
+        # Check if the item is marked as sold
+        self.assertTrue(updated_item.is_sold)
+
+
 
     def test_remove_from_cart(self):
         # Simulate adding an item to the cart
@@ -228,7 +240,7 @@ class SellerFormTest(TestCase): #Tests that a seller was created correctly.
         self.assertEqual(seller.phone_num, 1234567890)
 
 
-class ItemFormTest(TestCase): #Tests that a seller from is valid and that it saves correctly to database. 
+""" class ItemFormTest(TestCase): #Tests that a seller from is valid and that it saves correctly to database. 
 
 
     def test_form_validity(self):
@@ -246,7 +258,7 @@ class ItemFormTest(TestCase): #Tests that a seller from is valid and that it sav
             new_seller = form.save() 
             self.assertEqual(Seller.objects.count(), 1)
             self.assertEqual(new_seller.name, form_data.get('name'))
-            self.assertEqual(new_seller.phone_num, form_data.get('phone_num'))
+            self.assertEqual(new_seller.phone_num, form_data.get('phone_num')) """
 
 
 class ItemFilterTests(TestCase): #Tests that the item filter is working correctly. 

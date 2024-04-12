@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.http import HttpResponse, HttpResponseRedirect
 from .models import Item, Review
 from .forms import ItemForm, ReviewForm, SellerForm
 from .cart_manager import CartManager, StandardCheckout, CheckoutProcess, DiscountedCheckout
@@ -60,7 +61,6 @@ def add_item(request):
 
 def buy_item(request, item_id):
     # View to handle the buying of an item
-    item = get_object_or_404(Item, id=item_id)  # Get the item or show 404 error
     mark_item_as_sold(request, item_id)  # Mark the item as sold
     return redirect('item_list')  # Redirect to item list
 
@@ -69,7 +69,6 @@ def mark_item_as_sold(request, item_id):
     item = get_object_or_404(Item, pk=item_id)
     sold_notifier = ItemSoldNotifier()
     item.attach_observer(sold_notifier)
-
     item.mark_as_sold()
 
 def add_to_cart(request, item_id):
@@ -79,7 +78,12 @@ def add_to_cart(request, item_id):
 
 def remove_from_cart(request, item_id):
     # View to remove an item from the shopping cart
-    CartManager(request.session).update(item_id, action='remove')  # Remove item from cart
+    cart_manager = CartManager(request.session)
+    try:
+        cart_manager.update(item_id, action='remove')  # Remove item from cart
+    except KeyError as e:
+        # Handle the case where the cart is empty
+        return HttpResponse("Cart is empty!") 
     return redirect('cart_detail')  # Redirect to cart detail page
 
 def cart_detail(request):
@@ -95,7 +99,13 @@ def checkout(request):
         cart_manager = CartManager(request.session)
         checkout_process = CheckoutProcess(cart_manager, checkout_strategy)
         checkout_process.execute()
-        return redirect('item_list') 
+
+        item_ids = cart_manager.get_items().keys()
+        items = Item.objects.filter(id__in=item_ids)
+        items.update(is_sold=True)
+        return redirect('item_list')
+    else:
+        return HttpResponse("GET request to checkout not supported")
 
 def review_form(request):
     review_reciever = ReviewReciever()

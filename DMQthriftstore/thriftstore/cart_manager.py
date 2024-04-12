@@ -31,11 +31,11 @@ class DiscountedCheckout(CheckoutStrategy):
                 item.price -= discount  # Apply discount
                 item.is_sold = True
                 item.save()
-                print(f"Item {item.name} sold for {item.price} after a 20% discount. Original price was {og_price}.")
+                print(f"Item {item.title} sold for {item.price} after a 20% discount. Original price was {og_price}.")
             else:
                 item.is_sold = True
                 item.save()
-                print(f"Item {item.id} sold for {item.price} with no disocunt.")
+                print(f"Item {item.title} sold for {item.price} with no disocunt.")
         
         cart_manager.clear_cart()
 

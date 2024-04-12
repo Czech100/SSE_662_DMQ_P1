@@ -50,6 +50,7 @@ class Item(models.Model):
     def mark_as_sold(self):
         # Mark the item as sold and set the sold_at timestamp
         self.is_sold = True
+        self.sold_at = timezone.now()
         self.save()
         self.notify_observers()
 
