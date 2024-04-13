@@ -122,7 +122,7 @@ class ReviewFacade:
         if 'edit_review' in request.path:
             self.action = EditReview()
             return
-        if 'submit_edit_review' in request.path:
+        if 'submit_edited_review' in request.path:
             self.action = SubmitEditReview()
             return
         if 'delete_review' in request.path:

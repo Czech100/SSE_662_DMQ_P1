@@ -306,7 +306,7 @@ class DeleteReviewTest(TestCase): #Test the deletion and editing of reviews.
 
     def test_submit_review_edit_view(self):
         # Get the edit review page
-        response = self.client.get(reverse('submit_edit_review', args=[self.review.id]))
+        response = self.client.get(reverse('submit_edited_review', args=[self.review.id]))
 
         # Check that the response status code is 200 (OK)
         self.assertEqual(response.status_code, 200)
