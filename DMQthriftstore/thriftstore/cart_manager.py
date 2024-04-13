@@ -70,9 +70,6 @@ class CartManager:
 
     def remove_item(self, item_id):
         # Remove an item from the cart if it exists
-        """if str(item_id) in self.cart:
-            del self.cart[str(item_id)]
-            self.update_session()"""
         self.state.remove_item(item_id)
         self.update_session()
         if not self.cart:
@@ -90,13 +87,10 @@ class CartManager:
 
     def get_items(self):
         # Return the items in the cart
-        """return self.cart"""
         return self.state.get_items()
 
     def clear_cart(self):
         # Clear all items from the cart
-        """self.cart = {}
-        self.update_session()"""
         self.state.clear_cart()
         self.state = EmptyState(self)
 
@@ -182,4 +176,5 @@ class CheckOutState(State):
         pass
 
     def clear_cart(self):
-        pass
+        self.cart_manager.cart = {}
+        self.cart_manager.update_session()
