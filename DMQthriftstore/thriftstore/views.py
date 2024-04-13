@@ -107,31 +107,62 @@ def checkout(request):
     else:
         return HttpResponse("GET request to checkout not supported")
 
-def review_form(request):
-    review_reciever = ReviewReciever()
-    new_review_command = NewReviewCommand(review_reciever, request)
-    invoker = Invoker()
-    invoker.register_command("Create Review", new_review_command)
-    form = invoker.execute("Create Review")
-    if form == None: return redirect('item_list')
-    return render(request, 'review_form.html', {'form': form})
+def handle_review(request, review_id = None):
+    review_handle = ReviewFacade(request, review_id)
+    return review_handle.handle()
 
-def edit_review(request, review_id):
-    review_reciever = ReviewReciever()
-    edit_review_command = EditReviewCommand(review_reciever, request, review_id)
-    invoker = Invoker()
-    invoker.register_command("Edit Review", edit_review_command)
-    form = invoker.execute("Edit Review")
-    if form == None: return redirect('item_list')
-    return render(request, 'review_form.html', {'form': form})
 
-# Additional views for submitting review edits, deleting reviews, etc., follow a similar pattern
+class ReviewFacade:
+    def __init__(self, request, review_id):
+        self.request = request
+        self.review_id = review_id
+        if self.review_id == None and 'leave_review' in request.path:
+            self.action = LeaveReview()
+            return
+        if 'edit_review' in request.path:
+            self.action = EditReview()
+            return
+        if 'submit_edit_review' in request.path:
+            self.action = SubmitEditReview()
+            return
+        if 'delete_review' in request.path:
+            self.action = DeleteReview()
+            return
+        
+    def handle(self):
+        return self.action.handle_review(self.request, self.review_id) 
 
-def submit_review_edit(request, review_id):
-    review = get_object_or_404(Review, id=review_id)
-    return render(request, 'review_form_edit.html', {'review': review})
+class LeaveReview:
+    #Submit Review
+    def handle_review(self, request, review_id):
+        review_reciever = ReviewReciever()
+        new_review_command = NewReviewCommand(review_reciever, request)
+        invoker = Invoker()
+        invoker.register_command("Create Review", new_review_command)
+        form = invoker.execute("Create Review")
+        if form == None: return redirect('item_list')
+        return render(request, 'review_form.html', {'form': form})
 
-def delete_review(request, review_id):
-    review = get_object_or_404(Review, id=review_id)
-    review.delete()   
-    return redirect('item_list')
+class EditReview:
+    #Edit Review
+    def handle_review(self, request, review_id):
+        review_reciever = ReviewReciever()
+        edit_review_command = EditReviewCommand(review_reciever, request, review_id)
+        invoker = Invoker()
+        invoker.register_command("Edit Review", edit_review_command)
+        form = invoker.execute("Edit Review")
+        if form == None: return redirect('item_list')
+        return render(request, 'review_form.html', {'form': form})
+
+class SubmitEditReview:
+    #Submit Edit Review
+    def handle_review(self, request, review_id):
+        review = get_object_or_404(Review, id=review_id)
+        return render(request, 'review_form_edit.html', {'review': review})
+    
+class DeleteReview:
+    #Delete Review
+    def handle_review(self, request, review_id):
+        review = get_object_or_404(Review, id=review_id)
+        review.delete()   
+        return redirect('item_list')
