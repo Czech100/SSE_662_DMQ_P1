@@ -2,7 +2,7 @@ from django.shortcuts import redirect
 from .models import Item
 from decimal import Decimal
 
-
+#Strategy Pattern
 class CheckoutStrategy:
     def process_checkout(self, cart_manager):
         raise NotImplementedError("Subclasses must implement the process_checkout method.")
@@ -99,6 +99,7 @@ class CartManager:
         self.session['cart'] = self.cart
         self.session.modified = True
 
+#State Pattern
 class State:
     def __init__(self, cart_manager):
         self.cart_manager = cart_manager

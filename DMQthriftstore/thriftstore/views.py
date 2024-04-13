@@ -111,7 +111,7 @@ def handle_review(request, review_id = None):
     review_handle = ReviewFacade(request, review_id)
     return review_handle.handle()
 
-
+#Facade Pattern
 class ReviewFacade:
     def __init__(self, request, review_id):
         self.request = request

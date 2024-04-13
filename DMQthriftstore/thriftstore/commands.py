@@ -3,7 +3,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from .models import Review
 from .forms import ReviewForm
 
-#Command Interface
+#Command Pattern
 class CommandInterface:
     @abstractmethod
     def execute():

@@ -1,3 +1,4 @@
+#Observer Design Pattern
 class Observer:
     def update(self, subject):
         pass

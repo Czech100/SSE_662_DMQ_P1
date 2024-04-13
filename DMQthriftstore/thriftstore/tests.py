@@ -6,8 +6,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 
 
-# Create your tests here.
-
+# Factory Design Pattern
 class SellerFactory: #Creates a seller with default values if there are no arguments. Used to reduce redundant code of set ups.
     @staticmethod
     def create_seller(**kwargs):
